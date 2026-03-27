@@ -555,7 +555,9 @@
   <div class="tt" id="tt"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script>
-    const GEO =/*__GEO_DATA__*/nullconst DATA =/*__SCORE_DATA__*/null;
+    const GEO =/*__GEO_DATA__*/null;
+
+    const DATA =/*__SCORE_DATA__*/null;
     const STN =/*__STATION_DATA__*/null;
 
     const PREFS = ['東京', '神奈', '埼玉', '千葉', '茨城'];
@@ -579,8 +581,8 @@
       if (v == null) return 'rgba(194,209,238,.3)';
       const t = Math.max(0, Math.min(1, (v - cfg.min) / (cfg.max - cfg.min)));
       let r, g, b;
-      if (t < 0.5) { const s = t * 2; r = Math.round(26 + s * (69 - 26)); g = Math.round(50 + s * (144 - 50)); b = Math.round(96 + s * (184 - 96)) }
-      else { const s = (t - 0.5) * 2; r = Math.round(69 + s * (196 - 69)); g = Math.round(144 + s * (78 - 144)); b = Math.round(184 + s * (63 - 184)) }
+      if (t < 0.5) { const s = t * 2; r = Math.round(26 + s * (240 - 26)); g = Math.round(50 + s * (228 - 50)); b = Math.round(96 + s * (176 - 96)) }
+      else { const s = (t - 0.5) * 2; r = Math.round(240 + s * (196 - 240)); g = Math.round(228 + s * (78 - 228)); b = Math.round(176 + s * (63 - 176)) }
       return `rgb(${r},${g},${b})`;
     }
     function sca(v, a, cfg) {
@@ -588,8 +590,8 @@
       if (v == null) return `rgba(194,209,238,${a})`;
       const t = Math.max(0, Math.min(1, (v - cfg.min) / (cfg.max - cfg.min)));
       let r, g, b;
-      if (t < 0.5) { const s = t * 2; r = Math.round(26 + s * (69 - 26)); g = Math.round(50 + s * (144 - 50)); b = Math.round(96 + s * (184 - 96)) }
-      else { const s = (t - 0.5) * 2; r = Math.round(69 + s * (196 - 69)); g = Math.round(144 + s * (78 - 144)); b = Math.round(184 + s * (63 - 184)) }
+      if (t < 0.5) { const s = t * 2; r = Math.round(26 + s * (240 - 26)); g = Math.round(50 + s * (228 - 50)); b = Math.round(96 + s * (176 - 96)) }
+      else { const s = (t - 0.5) * 2; r = Math.round(240 + s * (196 - 240)); g = Math.round(228 + s * (78 - 228)); b = Math.round(176 + s * (63 - 176)) }
       return `rgba(${r},${g},${b},${a})`;
     }
 
