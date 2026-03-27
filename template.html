@@ -543,17 +543,15 @@
           <span id="stn-legend"
             style="display:none;margin-left:16px;border-left:1px solid var(--brd);padding-left:12px">
             <span style="display:inline-flex;align-items:center;gap:2px"><span
-                style="display:inline-block;width:16px;height:9px;border-radius:50%;background:radial-gradient(circle,rgba(255,220,120,.5),transparent);vertical-align:middle"></span>Hub
-              1.5km</span>
+                style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1A3260;vertical-align:middle"></span>Terminal</span>
             <span style="display:inline-flex;align-items:center;gap:2px;margin-left:6px"><span
-                style="display:inline-block;width:12px;height:8px;border-radius:50%;background:radial-gradient(circle,rgba(255,220,120,.3),transparent);vertical-align:middle"></span>JR
-              1km</span>
+                style="display:inline-block;width:6px;height:6px;border-radius:50%;background:rgba(26,50,96,.85);vertical-align:middle"></span>Hub</span>
             <span style="display:inline-flex;align-items:center;gap:2px;margin-left:6px"><span
-                style="display:inline-block;width:9px;height:7px;border-radius:50%;background:radial-gradient(circle,rgba(255,220,120,.2),transparent);vertical-align:middle"></span>Pvt
-              0.7km</span>
+                style="display:inline-block;width:5px;height:5px;border-radius:50%;background:rgba(69,144,184,.7);vertical-align:middle"></span>JR</span>
             <span style="display:inline-flex;align-items:center;gap:2px;margin-left:6px"><span
-                style="display:inline-block;width:6px;height:6px;border-radius:50%;background:radial-gradient(circle,rgba(255,220,120,.1),transparent);vertical-align:middle"></span>Local
-              0.4km</span>
+                style="display:inline-block;width:4px;height:4px;border-radius:50%;background:rgba(69,144,184,.45);vertical-align:middle"></span>Pvt</span>
+            <span style="display:inline-flex;align-items:center;gap:2px;margin-left:6px"><span
+                style="display:inline-block;width:3px;height:3px;border-radius:50%;background:rgba(194,209,238,.5);vertical-align:middle"></span>Local</span>
           </span>
         </div>
       </div>
@@ -824,8 +822,8 @@
       if (showStations) {
         // Influence radius in pixels (approx: 1km ≈ S*0.009 lat degrees)
         // Tier 1 Hub: 1.5km, Tier 2 JR: 1.0km, Tier 3 Private: 0.7km, Tier 4 Local: 0.4km
-        const tierKm = [0, 1.5, 1.0, 0.7, 0.4];
-        const tierAlpha = [0, 0.18, 0.12, 0.08, 0.04];
+        const tierKm = [2.0, 1.5, 1.0, 0.7, 0.4];
+        const tierAlpha = [0.22, 0.18, 0.12, 0.08, 0.04];
         const kmToPx = S * 0.009; // approximate conversion: 1km in projection pixels
 
         // Draw influence halos (back to front: tier 4 first, tier 1 last)
@@ -845,8 +843,8 @@
           }
         }
         // Draw station dots on top
-        const dotR = [0, 3.5, 2, 1.5, 1];
-        const dotC = [0, 'rgba(26,50,96,0.9)', 'rgba(69,144,184,0.7)', 'rgba(69,144,184,0.45)', 'rgba(194,209,238,0.5)'];
+        const dotR = [5, 3.5, 2, 1.5, 1];
+        const dotC = ['rgba(26,50,96,1)', 'rgba(26,50,96,0.9)', 'rgba(69,144,184,0.7)', 'rgba(69,144,184,0.45)', 'rgba(194,209,238,0.5)'];
         for (const s of STN) {
           const sx = px(s.lo), sy = py(s.la);
           if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
@@ -856,7 +854,7 @@
         // Station hover label
         if (hoveredStation) {
           const sx = px(hoveredStation.lo), sy = py(hoveredStation.la);
-          const tl = ['', 'Hub', 'JR', 'Private', 'Local'];
+          const tl = ['Terminal', 'Hub', 'JR', 'Private', 'Local'];
           const label = hoveredStation.s + ' (' + tl[hoveredStation.t] + ')';
           ctx.font = 'bold 10px system-ui';
           const tw = ctx.measureText(label).width;
@@ -946,7 +944,7 @@
       const nc = hit ? hit.code : null;
       if (nc !== hoveredCode || stnChanged) { hoveredCode = nc; drawMap() }
       if (hoveredStation) {
-        const tl = ['', 'Hub', 'JR', 'Private', 'Local'];
+        const tl = ['Terminal', 'Hub', 'JR', 'Private', 'Local'];
         tt.innerHTML = `<div class="tc">${hoveredStation.s}</div><div class="tp">${tl[hoveredStation.t]} station</div>`;
         tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 200) + 'px';
         tt.style.top = (e.clientY - 10) + 'px';
