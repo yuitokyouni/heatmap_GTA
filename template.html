@@ -463,6 +463,44 @@
       accent-color: #4590B8;
       margin: 0
     }
+
+    .zone-tabs {
+      display: flex;
+      gap: 3px;
+      padding: 12px 0 8px;
+      flex-wrap: wrap
+    }
+
+    .zone-tabs button {
+      background: #edf1f7;
+      border: 1px solid rgba(26, 50, 96, .1);
+      color: #3d5a80;
+      font-size: 11px;
+      font-family: var(--font);
+      padding: 5px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: .15s;
+      font-weight: 500
+    }
+
+    .zone-tabs button:hover {
+      border-color: #4590B8;
+      color: #1A3260
+    }
+
+    .zone-tabs button.on {
+      background: #1A3260;
+      border-color: #1A3260;
+      color: #fff;
+      font-weight: 600
+    }
+
+    .zone-tabs button .zcnt {
+      font-size: 9px;
+      opacity: .7;
+      margin-left: 3px
+    }
   </style>
 </head>
 
@@ -497,6 +535,9 @@
         <div class="sub">Choropleth — 297 Kantō municipalities scored on Macro + Station metrics</div>
       </div>
       <div class="badge">◆ ASTRO RESIDENTIAL FUND</div>
+    </div>
+    <div class="zone-tabs" id="zone-tabs">
+      <button class="on" data-zone="all">All Kantō<span class="zcnt">297</span></button>
     </div>
     <div class="metrics" id="mets"></div>
     <div class="top">
@@ -604,6 +645,86 @@
     const PC = { '東京': '#C44E3F', '神奈': '#4590B8', '埼玉': '#3A8A5C', '千葉': '#D4883E', '茨城': '#7B6DAF' };
 
     let activePref = null, hoveredCode = null, highlightCode = null, showStations = false, hoveredStation = null;
+
+    // Zone definitions
+    const ZONES =/*__ZONES_DATA__*/null;
+    let activeZone = 'all';
+    let zoneFilter = null; // set of codes to show, or null for all
+
+    function initZoneTabs() {
+      if (!ZONES) return;
+      const container = document.getElementById('zone-tabs');
+      // Add zone buttons
+      const zoneOrder = ['zone_23ku', 'zone_yokakawa', 'zone_tama', 'zone_saitama', 'zone_chiba_nw', 'zone_chiba_e', 'zone_kanagawa'];
+      zoneOrder.forEach(zid => {
+        const z = ZONES[zid];
+        if (!z) return;
+        const btn = document.createElement('button');
+        btn.dataset.zone = zid;
+        btn.innerHTML = z.name + '<span class="zcnt">' + z.count + '</span>';
+        container.appendChild(btn);
+      });
+      // Click handlers
+      container.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => {
+          container.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+          btn.classList.add('on');
+          activeZone = btn.dataset.zone;
+          if (activeZone === 'all') {
+            zoneFilter = null;
+            // Reset map bounds
+            zoom = 1; panX = 0; panY = 0;
+          } else {
+            const z = ZONES[activeZone];
+            zoneFilter = new Set(z.municipalities.map(m => m.code));
+            // Zoom to zone bounds
+            const b = z.bounds;
+            zoomToBounds(b.minLat, b.maxLat, b.minLon, b.maxLon);
+          }
+          activePref = null;
+          updatePrefButtons();
+          drawMap();
+          updateMetrics();
+          renderRanking();
+          updateHistogram();
+        };
+      });
+    }
+
+    function zoomToBounds(minLat, maxLat, minLon, maxLon) {
+      // Calculate zoom and pan to fit bounds in the canvas
+      const LAT_SCALE_L = Math.cos(((minLat + maxLat) / 2) * Math.PI / 180);
+      const geoW = (maxLon - minLon) * LAT_SCALE_L;
+      const geoH = maxLat - minLat;
+      const baseGeoW = (B.maxLon - B.minLon) * LAT_SCALE;
+      const baseGeoH = B.maxLat - B.minLat;
+
+      // How much to zoom
+      const zx = baseGeoW / geoW * 0.85;
+      const zy = baseGeoH / geoH * 0.85;
+      const newZoom = Math.min(zx, zy);
+
+      // Center coordinates in base projection
+      const cLon = (minLon + maxLon) / 2;
+      const cLat = (minLat + maxLat) / 2;
+
+      // Base projection positions (without zoom)
+      const baseCx = OX + ((cLon - B.minLon) * LAT_SCALE) * S;
+      const baseCy = OY + ((B.maxLat - cLat)) * S;
+
+      zoom = newZoom;
+      panX = W / 2 - baseCx * zoom;
+      panY = H / 2 - baseCy * zoom;
+    }
+
+    function updatePrefButtons() {
+      const fEl = document.getElementById('flt');
+      if (!fEl) return;
+      fEl.querySelectorAll('button').forEach(b => {
+        if (b.textContent === 'All') b.classList.add('on');
+        else b.classList.remove('on');
+      });
+    }
     let zoom = 1, panX = 0, panY = 0, isPanning = false, panStartX = 0, panStartY = 0;
     let metric = 'to'; // 'to', 'm', 'tr'
     const METRIC_CFG = {
@@ -678,9 +799,9 @@
     // Metrics bar
     function updateMetrics() {
       const cfg = METRIC_CFG[metric];
-      const vals = DATA.map(d => getVal(d)).filter(v => v != null);
+      const vals = DATA.filter(d => !zoneFilter || zoneFilter.has(d.c)).map(d => getVal(d)).filter(v => v != null);
       const avg = (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1);
-      const srt = [...DATA].filter(d => getVal(d) != null).sort((a, b) => getVal(b) - getVal(a));
+      const srt = [...DATA].filter(d => getVal(d) != null && (!zoneFilter || zoneFilter.has(d.c))).sort((a, b) => getVal(b) - getVal(a));
       const top = srt[0];
       const bot = srt[srt.length - 1];
       document.getElementById('mets').innerHTML =
@@ -1026,8 +1147,9 @@
     // HISTOGRAM
     let histChart = null;
     function updateHistogram() {
+      // Apply zone filter to histogram
       const cfg = METRIC_CFG[metric];
-      const vals = DATA.map(d => getVal(d)).filter(v => v != null);
+      const vals = DATA.filter(d => !zoneFilter || zoneFilter.has(d.c)).map(d => getVal(d)).filter(v => v != null);
       const nBins = 10;
       const range = cfg.max - cfg.min;
       const bins = Array(nBins).fill(0);
@@ -1056,6 +1178,7 @@
       d._origM = { pop: d.sp || 0, u20: d.su || 0, a39: d.sa || 0, inc: d.si || 0, saf: d.ss || 0, stn: d.tr };
     });
 
+    initZoneTabs();
     updateMetrics();
     updateLegend();
     setTimeout(drawMap, 50);

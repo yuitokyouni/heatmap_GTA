@@ -505,6 +505,16 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
     html = html.replace("/*__SCORE_DATA__*/null", score_json)
     html = html.replace("/*__STATION_DATA__*/null", station_json)
 
+    # Inject zones data if available
+    zones_path = SCRIPT_DIR / "secondary" / "zones.json"
+    if zones_path.exists():
+        with open(zones_path) as f:
+            zones_data = f.read()
+        html = html.replace("/*__ZONES_DATA__*/null", zones_data)
+        print(f"    Zones:    {len(zones_data)/1024:.0f} KB")
+    else:
+        print(f"    Zones:    (not found, zone tabs disabled)")
+
     print(f"  index.html: {len(html)/1024:.0f} KB")
     print(f"    GeoJSON:  {len(geo_json_merged)/1024:.0f} KB")
     print(f"    Scores:   {len(score_json)/1024:.0f} KB")
