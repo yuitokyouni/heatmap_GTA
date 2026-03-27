@@ -440,6 +440,29 @@
       font-weight: 700;
       font-family: var(--mono)
     }
+
+    .factors {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 6px 16px;
+      border-top: 1px solid var(--brd)
+    }
+
+    .factors label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--tx2);
+      cursor: pointer;
+      user-select: none
+    }
+
+    .factors input {
+      accent-color: #4590B8;
+      margin: 0
+    }
   </style>
 </head>
 
@@ -495,7 +518,25 @@
           <div class="tag" id="mt">297 polygons</div>
         </div>
         <div class="flt" id="flt"></div>
-        <div class="map-wrap"><canvas id="mc"></canvas></div>
+        <div class="factors" id="factors">
+          <span style="font-size:10px;color:var(--tx3);font-weight:600">Factors:</span>
+          <label><input type="checkbox" checked data-f="pop">Population</label>
+          <label><input type="checkbox" checked data-f="u20">Under 20</label>
+          <label><input type="checkbox" checked data-f="a39">Age 20-39</label>
+          <label><input type="checkbox" checked data-f="inc">Income</label>
+          <label><input type="checkbox" checked data-f="saf">Safety</label>
+        </div>
+        <div class="map-wrap">
+          <canvas id="mc"></canvas>
+          <div style="position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:4px;z-index:10">
+            <button onclick="zoomMap(1.3)"
+              style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(26,50,96,.15);background:#fff;color:#1A3260;font-size:16px;cursor:pointer;font-weight:700;box-shadow:0 1px 4px rgba(26,50,96,.1)">+</button>
+            <button onclick="zoomMap(1/1.3)"
+              style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(26,50,96,.15);background:#fff;color:#1A3260;font-size:16px;cursor:pointer;font-weight:700;box-shadow:0 1px 4px rgba(26,50,96,.1)">−</button>
+            <button onclick="resetZoom()"
+              style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(26,50,96,.15);background:#fff;color:#1A3260;font-size:11px;cursor:pointer;font-weight:600;box-shadow:0 1px 4px rgba(26,50,96,.1)">⟲</button>
+          </div>
+        </div>
         <div class="legend" id="leg-wrap"><span id="leg-lo">9</span>
           <div class="lgb" id="lgb"></div><span id="leg-hi">97</span><span style="margin-left:10px;font-style:italic"
             id="leg-label">Total score</span>
@@ -565,6 +606,7 @@
     const PC = { '東京': '#C44E3F', '神奈': '#4590B8', '埼玉': '#3A8A5C', '千葉': '#D4883E', '茨城': '#7B6DAF' };
 
     let activePref = null, hoveredCode = null, highlightCode = null, showStations = false, hoveredStation = null;
+    let zoom = 1, panX = 0, panY = 0, isPanning = false, panStartX = 0, panStartY = 0;
     let metric = 'to'; // 'to', 'm', 'tr'
     const METRIC_CFG = {
       to: { label: 'Total score', max: 97, min: 9, maxR: 100, field: 'to', sortKey: 'to' },
@@ -573,16 +615,17 @@
     };
 
     const tt = document.getElementById('tt');
+    if (!DATA || !GEO || !STN) { document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#1A3260"><h2>Template file</h2><p>This is the template. Run <code>python build_dashboard.py</code> to generate index.html</p></div>'; throw new Error('No data — this is the template file') }
     const SL = {}; DATA.forEach(d => { SL[d.c] = d });
 
     // Color scale: adapts to current metric range
     function sc(v, cfg) {
       cfg = cfg || METRIC_CFG[metric];
-      if (v == null) return 'rgba(194,209,238,.3)';
+      if (v == null) return 'rgba(194,209,238,.35)';
       const t = Math.max(0, Math.min(1, (v - cfg.min) / (cfg.max - cfg.min)));
       let r, g, b;
-      if (t < 0.5) { const s = t * 2; r = Math.round(26 + s * (240 - 26)); g = Math.round(50 + s * (228 - 50)); b = Math.round(96 + s * (176 - 96)) }
-      else { const s = (t - 0.5) * 2; r = Math.round(240 + s * (196 - 240)); g = Math.round(228 + s * (78 - 228)); b = Math.round(176 + s * (63 - 176)) }
+      if (t < 0.5) { const s = t * 2; r = Math.round(20 + s * (255 - 20)); g = Math.round(60 + s * (220 - 60)); b = Math.round(140 + s * (50 - 140)) }
+      else { const s = (t - 0.5) * 2; r = Math.round(255 + s * (210 - 255)); g = Math.round(220 + s * (45 - 220)); b = Math.round(50 + s * (35 - 50)) }
       return `rgb(${r},${g},${b})`;
     }
     function sca(v, a, cfg) {
@@ -590,10 +633,40 @@
       if (v == null) return `rgba(194,209,238,${a})`;
       const t = Math.max(0, Math.min(1, (v - cfg.min) / (cfg.max - cfg.min)));
       let r, g, b;
-      if (t < 0.5) { const s = t * 2; r = Math.round(26 + s * (240 - 26)); g = Math.round(50 + s * (228 - 50)); b = Math.round(96 + s * (176 - 96)) }
-      else { const s = (t - 0.5) * 2; r = Math.round(240 + s * (196 - 240)); g = Math.round(228 + s * (78 - 228)); b = Math.round(176 + s * (63 - 176)) }
+      if (t < 0.5) { const s = t * 2; r = Math.round(20 + s * (255 - 20)); g = Math.round(60 + s * (220 - 60)); b = Math.round(140 + s * (50 - 140)) }
+      else { const s = (t - 0.5) * 2; r = Math.round(255 + s * (210 - 255)); g = Math.round(220 + s * (45 - 220)); b = Math.round(50 + s * (35 - 50)) }
       return `rgba(${r},${g},${b},${a})`;
     }
+
+    // Factor toggles
+    const FACTORS = { pop: true, u20: true, a39: true, inc: true, saf: true };
+    function updateFactors() {
+      document.querySelectorAll('#factors input').forEach(cb => {
+        if (cb.dataset.f) FACTORS[cb.dataset.f] = cb.checked;
+      });
+      // Recalculate macro & total for all DATA entries
+      DATA.forEach(d => {
+        if (!d._origM) d._origM = { pop: d.sp || 0, u20: d.su || 0, a39: d.sa || 0, inc: d.si || 0, saf: d.ss || 0, stn: d.tr };
+        const om = d._origM;
+        let macro = 0;
+        if (FACTORS.pop) macro += om.pop;
+        if (FACTORS.u20) macro += om.u20;
+        if (FACTORS.a39) macro += om.a39;
+        if (FACTORS.inc) macro += om.inc;
+        if (FACTORS.saf) macro += om.saf;
+        d.m = macro;
+        if (om.stn != null) { d.to = macro + om.stn } else { d.to = Math.round(macro * 1.5 * 10) / 10 }
+      });
+      // Update GEO properties too
+      GEO.features.forEach(f => {
+        const s = SL[f.properties.c];
+        if (s) { f.properties.to = s.to; f.properties.m = s.m }
+      });
+      updateMetrics(); updateLegend(); drawMap(); renderRanking(); updateHistogram();
+    }
+    document.querySelectorAll('#factors input').forEach(cb => {
+      cb.addEventListener('change', updateFactors);
+    });
 
     function getVal(d) {
       const f = METRIC_CFG[metric].field;
@@ -621,8 +694,8 @@
     }
 
     // Mode buttons
-    document.getElementById('mode-btns').querySelectorAll('button').forEach(b => b.onclick = () => {
-      document.getElementById('mode-btns').querySelectorAll('button').forEach(x => x.classList.remove('on'));
+    document.getElementById('mode-btns')?.querySelectorAll('button').forEach(b => b.onclick = () => {
+      document.getElementById('mode-btns')?.querySelectorAll('button').forEach(x => x.classList.remove('on'));
       b.classList.add('on');
       metric = b.dataset.m;
       onMetricChange();
@@ -642,8 +715,8 @@
     // Filters
     const fEl = document.getElementById('flt');
     fEl.innerHTML = '<button class="on" data-p="all">All</button>' + PREFS.map(p => `<button data-p="${p}" style="border-left:3px solid ${PC[p]}">${PF[p]}</button>`).join('');
-    fEl.querySelectorAll('button').forEach(b => b.onclick = () => {
-      fEl.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    fEl?.querySelectorAll('button').forEach(b => b.onclick = () => {
+      fEl?.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on');
       activePref = b.dataset.p === 'all' ? null : b.dataset.p; drawMap(); renderRanking();
     });
 
@@ -671,8 +744,8 @@
       if (aspScr > aspGeo) { S = H / (B.maxLat - B.minLat); OX = (W - S * (B.maxLon - B.minLon) * LAT_SCALE) / 2; OY = 0 }
       else { S = W / ((B.maxLon - B.minLon) * LAT_SCALE); OX = 0; OY = (H - S * (B.maxLat - B.minLat)) / 2 }
     }
-    function px(lon) { return OX + ((lon - B.minLon) * LAT_SCALE) * S }
-    function py(lat) { return OY + ((B.maxLat - lat)) * S }
+    function px(lon) { return (OX + ((lon - B.minLon) * LAT_SCALE) * S) * zoom + panX }
+    function py(lat) { return (OY + ((B.maxLat - lat)) * S) * zoom + panY }
 
     let featurePaths = [];
     function buildPaths() {
@@ -726,8 +799,8 @@
           ctx.strokeStyle = 'rgba(26,50,96,.08)'; ctx.lineWidth = 0.3;
         } else {
           ctx.fillStyle = sc(val);
-          ctx.strokeStyle = isHov || isHl ? '#1A3260' : 'rgba(255,255,255,.6)';
-          ctx.lineWidth = isHov || isHl ? 2.5 : 0.5;
+          ctx.strokeStyle = isHov ? '#1A3260' : isHl ? '#4590B8' : 'rgba(255,255,255,.6)';
+          ctx.lineWidth = isHov ? 1.5 : isHl ? 2 : 0.5;
         }
         ctx.fill(); ctx.stroke();
 
@@ -825,7 +898,35 @@
       tt.classList.add('show');
     }
 
+    function zoomMap(factor) {
+      const cx = W / 2, cy = H / 2;
+      panX = (panX - cx) * factor + cx;
+      panY = (panY - cy) * factor + cy;
+      zoom *= factor;
+      zoom = Math.max(0.5, Math.min(zoom, 8));
+      drawMap();
+    }
+    function resetZoom() { zoom = 1; panX = 0; panY = 0; drawMap() }
+
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      panX = (panX - mx) * factor + mx;
+      panY = (panY - my) * factor + my;
+      zoom *= factor;
+      zoom = Math.max(0.5, Math.min(zoom, 8));
+      drawMap();
+    }, { passive: false });
+
+    canvas.addEventListener('mousedown', e => {
+      if (e.button === 0) { isPanning = true; panStartX = e.clientX - panX; panStartY = e.clientY - panY; canvas.style.cursor = 'grabbing' }
+    });
+    canvas.addEventListener('mouseup', () => { isPanning = false; canvas.style.cursor = 'crosshair' });
+
     canvas.addEventListener('mousemove', e => {
+      if (isPanning) { panX = e.clientX - panStartX; panY = e.clientY - panStartY; drawMap(); return }
       const rect = canvas.getBoundingClientRect();
       const mx = e.clientX - rect.left, my = e.clientY - rect.top;
       // Station hover (check first if stations visible)
@@ -900,27 +1001,29 @@
 
     // SCATTER
     const scData = DATA.filter(d => d.tr != null);
-    new Chart(document.getElementById('scc'), {
-      type: 'scatter',
-      data: {
-        datasets: PREFS.map(p => ({
-          label: PF[p],
-          data: scData.filter(d => d.p === p).map(d => ({ x: d.m, y: d.tr, label: d.n })),
-          backgroundColor: PC[p] + '88', borderColor: PC[p], borderWidth: 1, pointRadius: 3.5, pointHoverRadius: 6
-        }))
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        scales: {
-          x: { title: { display: true, text: 'Macro', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 },
-          y: { title: { display: true, text: 'Station', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 }
+    try {
+      new Chart(document.getElementById('scc'), {
+        type: 'scatter',
+        data: {
+          datasets: PREFS.map(p => ({
+            label: PF[p],
+            data: scData.filter(d => d.p === p).map(d => ({ x: d.m, y: d.tr, label: d.n })),
+            backgroundColor: PC[p] + '88', borderColor: PC[p], borderWidth: 1, pointRadius: 3.5, pointHoverRadius: 6
+          }))
         },
-        plugins: {
-          legend: { position: 'top', labels: { boxWidth: 8, padding: 10, color: '#3d5a80', font: { size: 10 } } },
-          tooltip: { callbacks: { label: c => `${c.raw.label}: M=${c.raw.x} S=${c.raw.y}` } }
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { title: { display: true, text: 'Macro', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 },
+            y: { title: { display: true, text: 'Station', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 8, padding: 10, color: '#3d5a80', font: { size: 10 } } },
+            tooltip: { callbacks: { label: c => `${c.raw.label}: M=${c.raw.x} S=${c.raw.y}` } }
+          }
         }
-      }
-    });
+      })
+    } catch (e) { console.warn('Scatter chart init failed:', e) }
 
     // HISTOGRAM
     let histChart = null;
@@ -949,7 +1052,12 @@
       });
     }
 
-    // Init
+    // Init — load sub-scores for factor toggles
+    // Sub-scores are embedded in DATA as sp,su,sa,si,ss
+    DATA.forEach(d => {
+      d._origM = { pop: d.sp || 0, u20: d.su || 0, a39: d.sa || 0, inc: d.si || 0, saf: d.ss || 0, stn: d.tr };
+    });
+
     updateMetrics();
     updateLegend();
     setTimeout(drawMap, 50);

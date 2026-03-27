@@ -426,6 +426,9 @@ def build_dashboard_data(results: list) -> str:
     compact = []
     for r in results:
         code = r["code"]
+        # Skip entries without a city name (county/prefecture-level aggregates)
+        if not r["city_jp"]:
+            continue
         pref_code = code[:2]
         pref_short = PREF_MAP.get(pref_code, "")
 
@@ -437,6 +440,12 @@ def build_dashboard_data(results: list) -> str:
             "m": r["macro_total"],
             "tr": round(r["station_score"], 1) if r["station_score"] is not None else None,
             "to": r["total_score"],
+            # Sub-scores for factor toggles
+            "sp": r.get("score_pop") or 0,
+            "su": r.get("score_under20") or 0,
+            "sa": r.get("score_2039") or 0,
+            "si": r.get("score_income") or 0,
+            "ss": r.get("score_safety") or 0,
         }
 
         # Add coordinates if available
