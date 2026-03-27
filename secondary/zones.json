@@ -1,0 +1,1648 @@
+{
+  "zone_23ku": {
+    "name": "東京23区",
+    "name_en": "Tokyo 23 Wards",
+    "color": "#C44E3F",
+    "municipalities": [
+      {
+        "code": "13109",
+        "name": "品川区",
+        "name_en": "Shinagawa",
+        "total": 97.0,
+        "macro": 47,
+        "station": 50.0,
+        "lat": 35.6288,
+        "lon": 139.739
+      },
+      {
+        "code": "13105",
+        "name": "文京区",
+        "name_en": "Bunkyo",
+        "total": 96.0,
+        "macro": 46,
+        "station": 50.0,
+        "lat": 35.7018,
+        "lon": 139.7451
+      },
+      {
+        "code": "13108",
+        "name": "江東区",
+        "name_en": "Koto",
+        "total": 95.0,
+        "macro": 45,
+        "station": 50.0,
+        "lat": 35.6719,
+        "lon": 139.7962
+      },
+      {
+        "code": "13115",
+        "name": "杉並区",
+        "name_en": "Suginami",
+        "total": 95.0,
+        "macro": 45,
+        "station": 50.0,
+        "lat": 35.7045,
+        "lon": 139.6201
+      },
+      {
+        "code": "13112",
+        "name": "世田谷区",
+        "name_en": "Setagaya",
+        "total": 94.0,
+        "macro": 44,
+        "station": 50.0,
+        "lat": 35.6118,
+        "lon": 139.6267
+      },
+      {
+        "code": "13114",
+        "name": "中野区",
+        "name_en": "Nakano",
+        "total": 94.0,
+        "macro": 44,
+        "station": 50.0,
+        "lat": 35.7058,
+        "lon": 139.6658
+      },
+      {
+        "code": "13117",
+        "name": "北区",
+        "name_en": "Kita",
+        "total": 94.0,
+        "macro": 44,
+        "station": 50.0,
+        "lat": 35.778,
+        "lon": 139.7209
+      },
+      {
+        "code": "13110",
+        "name": "目黒区",
+        "name_en": "Meguro",
+        "total": 93.0,
+        "macro": 43,
+        "station": 50.0,
+        "lat": 35.6439,
+        "lon": 139.6986
+      },
+      {
+        "code": "13111",
+        "name": "大田区",
+        "name_en": "Ota",
+        "total": 93.0,
+        "macro": 43,
+        "station": 50.0,
+        "lat": 35.5625,
+        "lon": 139.716
+      },
+      {
+        "code": "13119",
+        "name": "板橋区",
+        "name_en": "Itabashi",
+        "total": 93.0,
+        "macro": 43,
+        "station": 50.0,
+        "lat": 35.7777,
+        "lon": 139.6327
+      },
+      {
+        "code": "13107",
+        "name": "墨田区",
+        "name_en": "Sumida",
+        "total": 92.0,
+        "macro": 42,
+        "station": 50.0,
+        "lat": 35.6968,
+        "lon": 139.8141
+      },
+      {
+        "code": "13118",
+        "name": "荒川区",
+        "name_en": "Arakawa",
+        "total": 92.0,
+        "macro": 42,
+        "station": 50.0,
+        "lat": 35.7279,
+        "lon": 139.7713
+      },
+      {
+        "code": "13120",
+        "name": "練馬区",
+        "name_en": "Nerima",
+        "total": 92.0,
+        "macro": 42,
+        "station": 50.0,
+        "lat": 35.7379,
+        "lon": 139.6544
+      },
+      {
+        "code": "13101",
+        "name": "千代田区",
+        "name_en": "Chiyoda",
+        "total": 91.0,
+        "macro": 41,
+        "station": 50.0,
+        "lat": 35.6814,
+        "lon": 139.7661
+      },
+      {
+        "code": "13102",
+        "name": "中央区",
+        "name_en": "Chuo",
+        "total": 91.0,
+        "macro": 41,
+        "station": 50.0,
+        "lat": 35.672,
+        "lon": 139.764
+      },
+      {
+        "code": "13104",
+        "name": "新宿区",
+        "name_en": "Shinjuku",
+        "total": 90.0,
+        "macro": 40,
+        "station": 50.0,
+        "lat": 35.6887,
+        "lon": 139.6988
+      },
+      {
+        "code": "13106",
+        "name": "台東区",
+        "name_en": "Taito",
+        "total": 90.0,
+        "macro": 40,
+        "station": 50.0,
+        "lat": 35.7138,
+        "lon": 139.777
+      },
+      {
+        "code": "13103",
+        "name": "港区",
+        "name_en": "Minato",
+        "total": 89.0,
+        "macro": 39,
+        "station": 50.0,
+        "lat": 35.6662,
+        "lon": 139.7586
+      },
+      {
+        "code": "13116",
+        "name": "豊島区",
+        "name_en": "Toshima",
+        "total": 89.0,
+        "macro": 39,
+        "station": 50.0,
+        "lat": 35.7303,
+        "lon": 139.7111
+      },
+      {
+        "code": "13121",
+        "name": "足立区",
+        "name_en": "Adachi",
+        "total": 88.0,
+        "macro": 38,
+        "station": 50.0,
+        "lat": 35.7497,
+        "lon": 139.8049
+      },
+      {
+        "code": "13113",
+        "name": "渋谷区",
+        "name_en": "Shibuya",
+        "total": 87.0,
+        "macro": 37,
+        "station": 50.0,
+        "lat": 35.6595,
+        "lon": 139.7024
+      },
+      {
+        "code": "13122",
+        "name": "葛飾区",
+        "name_en": "Katsushika",
+        "total": 80.5,
+        "macro": 37,
+        "station": 43.5,
+        "lat": 35.7665,
+        "lon": 139.8476
+      },
+      {
+        "code": "13123",
+        "name": "江戸川区",
+        "name_en": "Edogawa",
+        "total": 80.5,
+        "macro": 35,
+        "station": 45.5,
+        "lat": 35.7332,
+        "lon": 139.8818
+      }
+    ],
+    "count": 23,
+    "center": {
+      "lat": 35.696113043478256,
+      "lon": 139.73535652173913
+    },
+    "bounds": {
+      "minLat": 35.5425,
+      "maxLat": 35.798,
+      "minLon": 139.6001,
+      "maxLon": 139.9018
+    }
+  },
+  "zone_yokakawa": {
+    "name": "横浜川崎",
+    "name_en": "Yokohama-Kawasaki",
+    "color": "#4590B8",
+    "municipalities": [
+      {
+        "code": "14133",
+        "name": "川崎市中原区",
+        "name_en": "Nakahara",
+        "total": 96.0,
+        "macro": 46,
+        "station": 50.0,
+        "lat": 35.5767,
+        "lon": 139.6596
+      },
+      {
+        "code": "14102",
+        "name": "横浜市神奈川区",
+        "name_en": "Kanagawa",
+        "total": 92.0,
+        "macro": 42,
+        "station": 50.0,
+        "lat": 35.478,
+        "lon": 139.6335
+      },
+      {
+        "code": "14135",
+        "name": "川崎市多摩区",
+        "name_en": "Tama",
+        "total": 91.5,
+        "macro": 45,
+        "station": 46.5,
+        "lat": 35.6209,
+        "lon": 139.57
+      },
+      {
+        "code": "14109",
+        "name": "横浜市港北区",
+        "name_en": "Kohoku",
+        "total": 91.0,
+        "macro": 41,
+        "station": 50.0,
+        "lat": 35.5539,
+        "lon": 139.6469
+      },
+      {
+        "code": "14132",
+        "name": "川崎市幸区",
+        "name_en": "Saiwai",
+        "total": 91.0,
+        "macro": 44,
+        "station": 47.0,
+        "lat": 35.5313,
+        "lon": 139.6975
+      },
+      {
+        "code": "14134",
+        "name": "川崎市高津区",
+        "name_en": "Takatsu",
+        "total": 91.0,
+        "macro": 41,
+        "station": 50.0,
+        "lat": 35.5394,
+        "lon": 139.6806
+      },
+      {
+        "code": "14130",
+        "name": "川崎市",
+        "name_en": "Kawasaki",
+        "total": 90.5,
+        "macro": 42,
+        "station": 48.5,
+        "lat": 35.5313,
+        "lon": 139.6975
+      },
+      {
+        "code": "14105",
+        "name": "横浜市南区",
+        "name_en": "Minami",
+        "total": 90.0,
+        "macro": 40,
+        "station": 50.0,
+        "lat": 35.5068,
+        "lon": 139.6173
+      },
+      {
+        "code": "14103",
+        "name": "横浜市西区",
+        "name_en": "Nishi",
+        "total": 88.0,
+        "macro": 38,
+        "station": 50.0,
+        "lat": 35.4662,
+        "lon": 139.6227
+      },
+      {
+        "code": "14101",
+        "name": "横浜市鶴見区",
+        "name_en": "Tsurumi",
+        "total": 87.0,
+        "macro": 37,
+        "station": 50.0,
+        "lat": 35.4956,
+        "lon": 139.6673
+      },
+      {
+        "code": "14131",
+        "name": "川崎市川崎区",
+        "name_en": "Kawasaki",
+        "total": 86.0,
+        "macro": 36,
+        "station": 50.0,
+        "lat": 35.5518,
+        "lon": 139.6715
+      },
+      {
+        "code": "14137",
+        "name": "川崎市麻生区",
+        "name_en": "Asao",
+        "total": 86.0,
+        "macro": 41,
+        "station": 45.0,
+        "lat": 35.6037,
+        "lon": 139.5076
+      },
+      {
+        "code": "14100",
+        "name": "横浜市",
+        "name_en": "Yokohama",
+        "total": 84.0,
+        "macro": 37,
+        "station": 47.0,
+        "lat": 35.4662,
+        "lon": 139.6227
+      },
+      {
+        "code": "14106",
+        "name": "横浜市保土ケ谷区",
+        "name_en": "Hodogaya",
+        "total": 83.0,
+        "macro": 36,
+        "station": 47.0,
+        "lat": 35.44,
+        "lon": 139.597
+      },
+      {
+        "code": "14113",
+        "name": "横浜市緑区",
+        "name_en": "Midori",
+        "total": 82.5,
+        "macro": 37,
+        "station": 45.5,
+        "lat": 35.5317,
+        "lon": 139.4947
+      },
+      {
+        "code": "14104",
+        "name": "横浜市中区",
+        "name_en": "Naka",
+        "total": 81.0,
+        "macro": 31,
+        "station": 50.0,
+        "lat": 35.4433,
+        "lon": 139.637
+      },
+      {
+        "code": "14136",
+        "name": "川崎市宮前区",
+        "name_en": "Miyamae",
+        "total": 80.5,
+        "macro": 42,
+        "station": 38.5,
+        "lat": 35.585,
+        "lon": 139.582
+      },
+      {
+        "code": "14110",
+        "name": "横浜市戸塚区",
+        "name_en": "Totsuka",
+        "total": 79.0,
+        "macro": 38,
+        "station": 41.0,
+        "lat": 35.4004,
+        "lon": 139.5343
+      },
+      {
+        "code": "14107",
+        "name": "横浜市磯子区",
+        "name_en": "Isogo",
+        "total": 78.5,
+        "macro": 35,
+        "station": 43.5,
+        "lat": 35.3869,
+        "lon": 139.6195
+      },
+      {
+        "code": "14111",
+        "name": "横浜市港南区",
+        "name_en": "Konan",
+        "total": 77.5,
+        "macro": 32,
+        "station": 45.5,
+        "lat": 35.4094,
+        "lon": 139.5966
+      },
+      {
+        "code": "14118",
+        "name": "横浜市都筑区",
+        "name_en": "Tsuzuki",
+        "total": 77.5,
+        "macro": 34,
+        "station": 43.5,
+        "lat": 35.5455,
+        "lon": 139.5743
+      },
+      {
+        "code": "14116",
+        "name": "横浜市泉区",
+        "name_en": "Izumi",
+        "total": 77.0,
+        "macro": 32,
+        "station": 45.0,
+        "lat": 35.4154,
+        "lon": 139.4873
+      },
+      {
+        "code": "14108",
+        "name": "横浜市金沢区",
+        "name_en": "Kanazawa",
+        "total": 76.0,
+        "macro": 26,
+        "station": 50.0,
+        "lat": 35.343,
+        "lon": 139.6216
+      },
+      {
+        "code": "14117",
+        "name": "横浜市青葉区",
+        "name_en": "Aoba",
+        "total": 75.0,
+        "macro": 33,
+        "station": 42.0,
+        "lat": 35.5686,
+        "lon": 139.5535
+      },
+      {
+        "code": "14112",
+        "name": "横浜市旭区",
+        "name_en": "Asahi",
+        "total": 74.5,
+        "macro": 32,
+        "station": 42.5,
+        "lat": 35.4633,
+        "lon": 139.5322
+      },
+      {
+        "code": "14153",
+        "name": "相模原市南区",
+        "name_en": "Minami",
+        "total": 72.5,
+        "macro": 34,
+        "station": 38.5,
+        "lat": 35.5804,
+        "lon": 139.3525
+      },
+      {
+        "code": "14152",
+        "name": "相模原市中央区",
+        "name_en": "Chuo",
+        "total": 72.0,
+        "macro": 30,
+        "station": 42.0,
+        "lat": 35.5322,
+        "lon": 139.4378
+      },
+      {
+        "code": "14114",
+        "name": "横浜市瀬谷区",
+        "name_en": "Seya",
+        "total": 69.0,
+        "macro": 30,
+        "station": 39.0,
+        "lat": 35.4704,
+        "lon": 139.4826
+      },
+      {
+        "code": "14150",
+        "name": "相模原市",
+        "name_en": "Sagamihara",
+        "total": 68.5,
+        "macro": 34,
+        "station": 34.5,
+        "lat": 35.595,
+        "lon": 139.3446
+      },
+      {
+        "code": "14115",
+        "name": "横浜市栄区",
+        "name_en": "Sakae",
+        "total": 67.5,
+        "macro": 33,
+        "station": 34.5,
+        "lat": 35.3679,
+        "lon": 139.5502
+      }
+    ],
+    "count": 30,
+    "center": {
+      "lat": 35.500006666666664,
+      "lon": 139.57641333333333
+    },
+    "bounds": {
+      "minLat": 35.323,
+      "maxLat": 35.6409,
+      "minLon": 139.3246,
+      "maxLon": 139.7175
+    }
+  },
+  "zone_tama": {
+    "name": "東京多摩",
+    "name_en": "Tokyo Tama",
+    "color": "#D4883E",
+    "municipalities": [
+      {
+        "code": "13225",
+        "name": "稲城市",
+        "name_en": "Inagi",
+        "total": 89.5,
+        "macro": 46,
+        "station": 43.5,
+        "lat": 35.6442,
+        "lon": 139.5028
+      },
+      {
+        "code": "13214",
+        "name": "国分寺市",
+        "name_en": "Kokubunji",
+        "total": 89.0,
+        "macro": 47,
+        "station": 42.0,
+        "lat": 35.7001,
+        "lon": 139.4808
+      },
+      {
+        "code": "13219",
+        "name": "狛江市",
+        "name_en": "Komae",
+        "total": 87.0,
+        "macro": 40,
+        "station": 47.0,
+        "lat": 35.632,
+        "lon": 139.5771
+      },
+      {
+        "code": "13208",
+        "name": "調布市",
+        "name_en": "Chofu",
+        "total": 86.5,
+        "macro": 40,
+        "station": 46.5,
+        "lat": 35.6522,
+        "lon": 139.544
+      },
+      {
+        "code": "13210",
+        "name": "小金井市",
+        "name_en": "Koganei",
+        "total": 85.0,
+        "macro": 43,
+        "station": 42.0,
+        "lat": 35.7013,
+        "lon": 139.5065
+      },
+      {
+        "code": "13211",
+        "name": "小平市",
+        "name_en": "Kodaira",
+        "total": 83.5,
+        "macro": 40,
+        "station": 43.5,
+        "lat": 35.737,
+        "lon": 139.4885
+      },
+      {
+        "code": "13204",
+        "name": "三鷹市",
+        "name_en": "Mitaka",
+        "total": 83.0,
+        "macro": 41,
+        "station": 42.0,
+        "lat": 35.7027,
+        "lon": 139.5603
+      },
+      {
+        "code": "13206",
+        "name": "府中市",
+        "name_en": "Fuchu",
+        "total": 82.5,
+        "macro": 36,
+        "station": 46.5,
+        "lat": 35.6722,
+        "lon": 139.4799
+      },
+      {
+        "code": "13229",
+        "name": "西東京市",
+        "name_en": "Nishitokyo",
+        "total": 81.5,
+        "macro": 38,
+        "station": 43.5,
+        "lat": 35.7482,
+        "lon": 139.5678
+      },
+      {
+        "code": "13212",
+        "name": "日野市",
+        "name_en": "Hino",
+        "total": 80.5,
+        "macro": 39,
+        "station": 41.5,
+        "lat": 35.6595,
+        "lon": 139.3815
+      },
+      {
+        "code": "13213",
+        "name": "東村山市",
+        "name_en": "Higashimurayama",
+        "total": 80.5,
+        "macro": 34,
+        "station": 46.5,
+        "lat": 35.7601,
+        "lon": 139.4658
+      },
+      {
+        "code": "13202",
+        "name": "立川市",
+        "name_en": "Tachikawa",
+        "total": 79.5,
+        "macro": 33,
+        "station": 46.5,
+        "lat": 35.6982,
+        "lon": 139.4137
+      },
+      {
+        "code": "13203",
+        "name": "武蔵野市",
+        "name_en": "Musashino",
+        "total": 76.5,
+        "macro": 33,
+        "station": 43.5,
+        "lat": 35.7031,
+        "lon": 139.5798
+      },
+      {
+        "code": "13215",
+        "name": "国立市",
+        "name_en": "Kunitachi",
+        "total": 76.5,
+        "macro": 35,
+        "station": 41.5,
+        "lat": 35.6992,
+        "lon": 139.4463
+      },
+      {
+        "code": "13221",
+        "name": "清瀬市",
+        "name_en": "Kiyose",
+        "total": 74.0,
+        "macro": 35,
+        "station": 39.0,
+        "lat": 35.7722,
+        "lon": 139.5199
+      },
+      {
+        "code": "13207",
+        "name": "昭島市",
+        "name_en": "Akishima",
+        "total": 71.5,
+        "macro": 33,
+        "station": 38.5,
+        "lat": 35.7133,
+        "lon": 139.3616
+      },
+      {
+        "code": "13209",
+        "name": "町田市",
+        "name_en": "Machida",
+        "total": 70.0,
+        "macro": 31,
+        "station": 39.0,
+        "lat": 35.542,
+        "lon": 139.4456
+      },
+      {
+        "code": "13224",
+        "name": "多摩市",
+        "name_en": "Tama",
+        "total": 69.0,
+        "macro": 29,
+        "station": 40.0,
+        "lat": 35.637,
+        "lon": 139.445
+      },
+      {
+        "code": "13222",
+        "name": "東久留米市",
+        "name_en": "Higashikurume",
+        "total": 66.5,
+        "macro": 29,
+        "station": 37.5,
+        "lat": 35.7604,
+        "lon": 139.5337
+      },
+      {
+        "code": "13201",
+        "name": "八王子市",
+        "name_en": "Hachioji",
+        "total": 65.5,
+        "macro": 30,
+        "station": 35.5,
+        "lat": 35.6556,
+        "lon": 139.339
+      },
+      {
+        "code": "13220",
+        "name": "東大和市",
+        "name_en": "Higashiyamato",
+        "total": 64.0,
+        "macro": 24,
+        "station": 40.0,
+        "lat": 35.7328,
+        "lon": 139.4342
+      },
+      {
+        "code": "13218",
+        "name": "福生市",
+        "name_en": "Fussa",
+        "total": 62.5,
+        "macro": 23,
+        "station": 39.5,
+        "lat": 35.7425,
+        "lon": 139.3278
+      }
+    ],
+    "count": 22,
+    "center": {
+      "lat": 35.6939,
+      "lon": 139.4728
+    },
+    "bounds": {
+      "minLat": 35.522,
+      "maxLat": 35.7922,
+      "minLon": 139.3078,
+      "maxLon": 139.59980000000002
+    }
+  },
+  "zone_saitama": {
+    "name": "さいたま圏",
+    "name_en": "Saitama",
+    "color": "#3A8A5C",
+    "municipalities": [
+      {
+        "code": "11108",
+        "name": "さいたま市南区",
+        "name_en": "Minami",
+        "total": 87.0,
+        "macro": 45,
+        "station": 42.0,
+        "lat": 35.846,
+        "lon": 139.648
+      },
+      {
+        "code": "11103",
+        "name": "さいたま市大宮区",
+        "name_en": "Omiya",
+        "total": 86.5,
+        "macro": 40,
+        "station": 46.5,
+        "lat": 35.9064,
+        "lon": 139.6241
+      },
+      {
+        "code": "11105",
+        "name": "さいたま市中央区",
+        "name_en": "Chuo",
+        "total": 86.0,
+        "macro": 41,
+        "station": 45.0,
+        "lat": 35.8675,
+        "lon": 139.6311
+      },
+      {
+        "code": "11107",
+        "name": "さいたま市浦和区",
+        "name_en": "Urawa",
+        "total": 84.5,
+        "macro": 46,
+        "station": 38.5,
+        "lat": 35.8585,
+        "lon": 139.6571
+      },
+      {
+        "code": "11227",
+        "name": "朝霞市",
+        "name_en": "Asaka",
+        "total": 84.0,
+        "macro": 42,
+        "station": 42.0,
+        "lat": 35.7967,
+        "lon": 139.6003
+      },
+      {
+        "code": "11229",
+        "name": "和光市",
+        "name_en": "Wako",
+        "total": 84.0,
+        "macro": 43,
+        "station": 41.0,
+        "lat": 35.7885,
+        "lon": 139.6124
+      },
+      {
+        "code": "11109",
+        "name": "さいたま市緑区",
+        "name_en": "Midori",
+        "total": 82.5,
+        "macro": 45,
+        "station": 37.5,
+        "lat": 35.8641,
+        "lon": 139.7046
+      },
+      {
+        "code": "11100",
+        "name": "さいたま市",
+        "name_en": "Saitama",
+        "total": 81.5,
+        "macro": 41,
+        "station": 40.5,
+        "lat": 35.9064,
+        "lon": 139.6241
+      },
+      {
+        "code": "11223",
+        "name": "蕨市",
+        "name_en": "Warabi",
+        "total": 81.5,
+        "macro": 36,
+        "station": 45.5,
+        "lat": 35.828,
+        "lon": 139.6904
+      },
+      {
+        "code": "11101",
+        "name": "さいたま市西区",
+        "name_en": "Nishi",
+        "total": 81.0,
+        "macro": 47,
+        "station": 34.0,
+        "lat": 35.917,
+        "lon": 139.565
+      },
+      {
+        "code": "11102",
+        "name": "さいたま市北区",
+        "name_en": "Kita",
+        "total": 80.0,
+        "macro": 37,
+        "station": 43.0,
+        "lat": 35.9403,
+        "lon": 139.6095
+      },
+      {
+        "code": "11234",
+        "name": "八潮市",
+        "name_en": "Yashio",
+        "total": 78.0,
+        "macro": 40,
+        "station": 38.0,
+        "lat": 35.8079,
+        "lon": 139.845
+      },
+      {
+        "code": "11224",
+        "name": "戸田市",
+        "name_en": "Toda",
+        "total": 77.0,
+        "macro": 35,
+        "station": 42.0,
+        "lat": 35.8177,
+        "lon": 139.6695
+      },
+      {
+        "code": "11203",
+        "name": "川口市",
+        "name_en": "Kawaguchi",
+        "total": 76.5,
+        "macro": 34,
+        "station": 42.5,
+        "lat": 35.8019,
+        "lon": 139.7175
+      },
+      {
+        "code": "11228",
+        "name": "志木市",
+        "name_en": "Shiki",
+        "total": 74.0,
+        "macro": 35,
+        "station": 39.0,
+        "lat": 35.8221,
+        "lon": 139.5754
+      },
+      {
+        "code": "11104",
+        "name": "さいたま市見沼区",
+        "name_en": "Minuma",
+        "total": 73.5,
+        "macro": 38,
+        "station": 35.5,
+        "lat": 35.9488,
+        "lon": 139.6403
+      },
+      {
+        "code": "11221",
+        "name": "草加市",
+        "name_en": "Soka",
+        "total": 73.5,
+        "macro": 33,
+        "station": 40.5,
+        "lat": 35.8285,
+        "lon": 139.8034
+      },
+      {
+        "code": "11235",
+        "name": "富士見市",
+        "name_en": "Fujimi",
+        "total": 72.0,
+        "macro": 35,
+        "station": 37.0,
+        "lat": 35.8382,
+        "lon": 139.5508
+      },
+      {
+        "code": "11230",
+        "name": "新座市",
+        "name_en": "Niiza",
+        "total": 70.5,
+        "macro": 33,
+        "station": 37.5,
+        "lat": 35.8038,
+        "lon": 139.5563
+      },
+      {
+        "code": "11208",
+        "name": "所沢市",
+        "name_en": "Tokorozawa",
+        "total": 69.0,
+        "macro": 30,
+        "station": 39.0,
+        "lat": 35.7866,
+        "lon": 139.4733
+      },
+      {
+        "code": "11222",
+        "name": "越谷市",
+        "name_en": "Koshigaya",
+        "total": 68.0,
+        "macro": 29,
+        "station": 39.0,
+        "lat": 35.8875,
+        "lon": 139.7862
+      },
+      {
+        "code": "11237",
+        "name": "三郷市",
+        "name_en": "Misato",
+        "total": 67.5,
+        "macro": 32,
+        "station": 35.5,
+        "lat": 35.845,
+        "lon": 139.8863
+      },
+      {
+        "code": "11106",
+        "name": "さいたま市桜区",
+        "name_en": "Sakura",
+        "total": 66.5,
+        "macro": 32,
+        "station": 34.5,
+        "lat": 35.8441,
+        "lon": 139.6277
+      },
+      {
+        "code": "11243",
+        "name": "吉川市",
+        "name_en": "Yoshikawa",
+        "total": 66.5,
+        "macro": 29,
+        "station": 37.5,
+        "lat": 35.8766,
+        "lon": 139.8432
+      },
+      {
+        "code": "11219",
+        "name": "上尾市",
+        "name_en": "Ageo",
+        "total": 66.0,
+        "macro": 32,
+        "station": 34.0,
+        "lat": 35.9735,
+        "lon": 139.5884
+      },
+      {
+        "code": "11110",
+        "name": "さいたま市岩槻区",
+        "name_en": "Iwatsuki",
+        "total": 64.0,
+        "macro": 33,
+        "station": 31.0,
+        "lat": 35.9502,
+        "lon": 139.6932
+      },
+      {
+        "code": "11245",
+        "name": "ふじみ野市",
+        "name_en": "Fujimino",
+        "total": 64.0,
+        "macro": 30,
+        "station": 34.0,
+        "lat": 35.8739,
+        "lon": 139.5118
+      },
+      {
+        "code": "11246",
+        "name": "白岡市",
+        "name_en": "Shiraoka",
+        "total": 64.0,
+        "macro": 33,
+        "station": 31.0,
+        "lat": 35.992,
+        "lon": 139.677
+      },
+      {
+        "code": "11201",
+        "name": "川越市",
+        "name_en": "Kawagoe",
+        "total": 62.0,
+        "macro": 28,
+        "station": 34.0,
+        "lat": 35.9067,
+        "lon": 139.4831
+      },
+      {
+        "code": "11241",
+        "name": "鶴ヶ島市",
+        "name_en": "Tsurugashima",
+        "total": 60.5,
+        "macro": 25,
+        "station": 35.5,
+        "lat": 35.9368,
+        "lon": 139.4238
+      },
+      {
+        "code": "11442",
+        "name": "南埼玉郡宮代町",
+        "name_en": "Miyashiro",
+        "total": 60.0,
+        "macro": 26,
+        "station": 34.0,
+        "lat": 36.024,
+        "lon": 139.722
+      },
+      {
+        "code": "11231",
+        "name": "桶川市",
+        "name_en": "Okegawa",
+        "total": 58.0,
+        "macro": 27,
+        "station": 31.0,
+        "lat": 35.9984,
+        "lon": 139.5643
+      },
+      {
+        "code": "11215",
+        "name": "狭山市",
+        "name_en": "Sayama",
+        "total": 57.0,
+        "macro": 23,
+        "station": 34.0,
+        "lat": 35.8569,
+        "lon": 139.413
+      },
+      {
+        "code": "11232",
+        "name": "久喜市",
+        "name_en": "Kuki",
+        "total": 57.0,
+        "macro": 23,
+        "station": 34.0,
+        "lat": 36.0657,
+        "lon": 139.6773
+      },
+      {
+        "code": "11239",
+        "name": "坂戸市",
+        "name_en": "Sakado",
+        "total": 57.0,
+        "macro": 23,
+        "station": 34.0,
+        "lat": 35.9572,
+        "lon": 139.394
+      },
+      {
+        "code": "11341",
+        "name": "比企郡滑川町",
+        "name_en": "Namegawa",
+        "total": 57.0,
+        "macro": 38,
+        "station": null,
+        "lat": 36.063,
+        "lon": 139.363
+      },
+      {
+        "code": "11214",
+        "name": "春日部市",
+        "name_en": "Kasukabe",
+        "total": 56.5,
+        "macro": 21,
+        "station": 35.5,
+        "lat": 35.9801,
+        "lon": 139.7523
+      }
+    ],
+    "count": 37,
+    "center": {
+      "lat": 35.892067567567565,
+      "lon": 139.62715405405407
+    },
+    "bounds": {
+      "minLat": 35.7666,
+      "maxLat": 36.0857,
+      "minLon": 139.343,
+      "maxLon": 139.90630000000002
+    }
+  },
+  "zone_chiba_nw": {
+    "name": "千葉北西・TX",
+    "name_en": "Chiba NW / TX",
+    "color": "#7B6DAF",
+    "municipalities": [
+      {
+        "code": "12220",
+        "name": "流山市",
+        "name_en": "Nagareyama",
+        "total": 91.0,
+        "macro": 49,
+        "station": 42.0,
+        "lat": 35.8721,
+        "lon": 139.9259
+      },
+      {
+        "code": "12227",
+        "name": "浦安市",
+        "name_en": "Urayasu",
+        "total": 88.0,
+        "macro": 38,
+        "station": 50.0,
+        "lat": 35.6659,
+        "lon": 139.8932
+      },
+      {
+        "code": "12203",
+        "name": "市川市",
+        "name_en": "Ichikawa",
+        "total": 87.0,
+        "macro": 40,
+        "station": 47.0,
+        "lat": 35.7289,
+        "lon": 139.9081
+      },
+      {
+        "code": "12204",
+        "name": "船橋市",
+        "name_en": "Funabashi",
+        "total": 81.0,
+        "macro": 36,
+        "station": 45.0,
+        "lat": 35.7019,
+        "lon": 139.9847
+      },
+      {
+        "code": "12207",
+        "name": "松戸市",
+        "name_en": "Matsudo",
+        "total": 78.5,
+        "macro": 35,
+        "station": 43.5,
+        "lat": 35.7845,
+        "lon": 139.9008
+      },
+      {
+        "code": "12217",
+        "name": "柏市",
+        "name_en": "Kashiwa",
+        "total": 77.5,
+        "macro": 40,
+        "station": 37.5,
+        "lat": 35.8623,
+        "lon": 139.9711
+      },
+      {
+        "code": "12221",
+        "name": "八千代市",
+        "name_en": "Yachiyo",
+        "total": 75.5,
+        "macro": 40,
+        "station": 35.5,
+        "lat": 35.7154,
+        "lon": 140.1261
+      },
+      {
+        "code": "08224",
+        "name": "守谷市",
+        "name_en": "Moriya",
+        "total": 72.0,
+        "macro": 38,
+        "station": 34.0,
+        "lat": 35.9506,
+        "lon": 139.9922
+      },
+      {
+        "code": "12224",
+        "name": "鎌ケ谷市",
+        "name_en": "Kamagaya",
+        "total": 71.0,
+        "macro": 31,
+        "station": 40.0,
+        "lat": 35.7802,
+        "lon": 139.9995
+      },
+      {
+        "code": "12206",
+        "name": "木更津市",
+        "name_en": "Kisarazu",
+        "total": 70.0,
+        "macro": 39,
+        "station": 31.0,
+        "lat": 35.3817,
+        "lon": 139.9261
+      },
+      {
+        "code": "08235",
+        "name": "つくばみらい市",
+        "name_en": "Tsukubamiai",
+        "total": 68.0,
+        "macro": 42,
+        "station": 26.0,
+        "lat": 35.9951,
+        "lon": 140.0386
+      },
+      {
+        "code": "08220",
+        "name": "つくば市",
+        "name_en": "Tsukuba",
+        "total": 66.5,
+        "macro": 44,
+        "station": 22.5,
+        "lat": 36.0825,
+        "lon": 140.1106
+      },
+      {
+        "code": "12229",
+        "name": "袖ケ浦市",
+        "name_en": "Sodegaura",
+        "total": 66.5,
+        "macro": 46,
+        "station": 20.5,
+        "lat": 35.354,
+        "lon": 139.951
+      },
+      {
+        "code": "12231",
+        "name": "印西市",
+        "name_en": "Inzai",
+        "total": 66.0,
+        "macro": 42,
+        "station": 24.0,
+        "lat": 35.8002,
+        "lon": 140.1162
+      },
+      {
+        "code": "12222",
+        "name": "我孫子市",
+        "name_en": "Abiko",
+        "total": 62.0,
+        "macro": 30,
+        "station": 32.0,
+        "lat": 35.8728,
+        "lon": 140.0105
+      },
+      {
+        "code": "12208",
+        "name": "野田市",
+        "name_en": "Noda",
+        "total": 58.5,
+        "macro": 28,
+        "station": 30.5,
+        "lat": 35.9437,
+        "lon": 139.8707
+      },
+      {
+        "code": "08217",
+        "name": "取手市",
+        "name_en": "Toride",
+        "total": 56.5,
+        "macro": 21,
+        "station": 35.5,
+        "lat": 35.8955,
+        "lon": 140.063
+      },
+      {
+        "code": "12211",
+        "name": "成田市",
+        "name_en": "Narita",
+        "total": 56.5,
+        "macro": 29,
+        "station": 27.5,
+        "lat": 35.7778,
+        "lon": 140.3139
+      }
+    ],
+    "count": 18,
+    "center": {
+      "lat": 35.786950000000004,
+      "lon": 140.00567777777778
+    },
+    "bounds": {
+      "minLat": 35.333999999999996,
+      "maxLat": 36.102500000000006,
+      "minLon": 139.8507,
+      "maxLon": 140.3339
+    }
+  },
+  "zone_chiba_e": {
+    "name": "千葉・千葉市圏",
+    "name_en": "Chiba City Area",
+    "color": "#B8456A",
+    "municipalities": [
+      {
+        "code": "12101",
+        "name": "千葉市中央区",
+        "name_en": "Chuo",
+        "total": 79.0,
+        "macro": 36,
+        "station": 43.0,
+        "lat": 35.607,
+        "lon": 140.123
+      },
+      {
+        "code": "12216",
+        "name": "習志野市",
+        "name_en": "Narashino",
+        "total": 77.5,
+        "macro": 34,
+        "station": 43.5,
+        "lat": 35.6914,
+        "lon": 140.0202
+      },
+      {
+        "code": "12228",
+        "name": "四街道市",
+        "name_en": "Yotsukaido",
+        "total": 73.0,
+        "macro": 39,
+        "station": 34.0,
+        "lat": 35.6628,
+        "lon": 140.165
+      },
+      {
+        "code": "12102",
+        "name": "千葉市花見川区",
+        "name_en": "Hanamigawa",
+        "total": 72.5,
+        "macro": 34,
+        "station": 38.5,
+        "lat": 35.6517,
+        "lon": 140.073
+      },
+      {
+        "code": "12106",
+        "name": "千葉市美浜区",
+        "name_en": "Mihama",
+        "total": 71.5,
+        "macro": 33,
+        "station": 38.5,
+        "lat": 35.6484,
+        "lon": 140.0419
+      },
+      {
+        "code": "12100",
+        "name": "千葉市",
+        "name_en": "Chiba",
+        "total": 70.5,
+        "macro": 32,
+        "station": 38.5,
+        "lat": 35.607,
+        "lon": 140.106
+      },
+      {
+        "code": "12103",
+        "name": "千葉市稲毛区",
+        "name_en": "Inage",
+        "total": 69.0,
+        "macro": 29,
+        "station": 40.0,
+        "lat": 35.6373,
+        "lon": 140.0926
+      },
+      {
+        "code": "12105",
+        "name": "千葉市緑区",
+        "name_en": "Midori",
+        "total": 62.0,
+        "macro": 35,
+        "station": 27.0,
+        "lat": 35.5309,
+        "lon": 140.2698
+      },
+      {
+        "code": "12104",
+        "name": "千葉市若葉区",
+        "name_en": "Wakaba",
+        "total": 61.0,
+        "macro": 27,
+        "station": 34.0,
+        "lat": 35.6361,
+        "lon": 140.1492
+      }
+    ],
+    "count": 9,
+    "center": {
+      "lat": 35.630288888888884,
+      "lon": 140.11563333333334
+    },
+    "bounds": {
+      "minLat": 35.5109,
+      "maxLat": 35.711400000000005,
+      "minLon": 140.00019999999998,
+      "maxLon": 140.2898
+    }
+  },
+  "zone_kanagawa": {
+    "name": "神奈川その他",
+    "name_en": "Kanagawa Other",
+    "color": "#5A9A7A",
+    "municipalities": [
+      {
+        "code": "14215",
+        "name": "海老名市",
+        "name_en": "Ebina",
+        "total": 85.0,
+        "macro": 43,
+        "station": 42.0,
+        "lat": 35.4543,
+        "lon": 139.3893
+      },
+      {
+        "code": "14205",
+        "name": "藤沢市",
+        "name_en": "Fujisawa",
+        "total": 82.0,
+        "macro": 40,
+        "station": 42.0,
+        "lat": 35.3389,
+        "lon": 139.4873
+      },
+      {
+        "code": "14204",
+        "name": "鎌倉市",
+        "name_en": "Kamakura",
+        "total": 80.5,
+        "macro": 34,
+        "station": 46.5,
+        "lat": 35.3188,
+        "lon": 139.5504
+      },
+      {
+        "code": "14207",
+        "name": "茅ヶ崎市",
+        "name_en": "Chigasaki",
+        "total": 74.5,
+        "macro": 37,
+        "station": 37.5,
+        "lat": 35.3307,
+        "lon": 139.4072
+      },
+      {
+        "code": "14208",
+        "name": "逗子市",
+        "name_en": "Zushi",
+        "total": 73.0,
+        "macro": 31,
+        "station": 42.0,
+        "lat": 35.2974,
+        "lon": 139.5783
+      },
+      {
+        "code": "14216",
+        "name": "座間市",
+        "name_en": "Zama",
+        "total": 69.5,
+        "macro": 31,
+        "station": 38.5,
+        "lat": 35.4809,
+        "lon": 139.3999
+      },
+      {
+        "code": "14213",
+        "name": "大和市",
+        "name_en": "Yamato",
+        "total": 66.5,
+        "macro": 37,
+        "station": 29.5,
+        "lat": 35.462,
+        "lon": 139.461
+      },
+      {
+        "code": "14366",
+        "name": "足柄上郡開成町",
+        "name_en": "Kaisei",
+        "total": 66.0,
+        "macro": 44,
+        "station": null,
+        "lat": 35.339,
+        "lon": 139.121
+      },
+      {
+        "code": "14321",
+        "name": "高座郡寒川町",
+        "name_en": "Samukawa",
+        "total": 65.5,
+        "macro": 27,
+        "station": 38.5,
+        "lat": 35.37,
+        "lon": 139.382
+      },
+      {
+        "code": "14214",
+        "name": "伊勢原市",
+        "name_en": "Isehara",
+        "total": 61.5,
+        "macro": 31,
+        "station": 30.5,
+        "lat": 35.3961,
+        "lon": 139.3138
+      },
+      {
+        "code": "14201",
+        "name": "横須賀市",
+        "name_en": "Yokosuka",
+        "total": 59.5,
+        "macro": 21,
+        "station": 38.5,
+        "lat": 35.2786,
+        "lon": 139.6702
+      },
+      {
+        "code": "14341",
+        "name": "中郡大磯町",
+        "name_en": "Oiso",
+        "total": 57.0,
+        "macro": 26,
+        "station": 31.0,
+        "lat": 35.309,
+        "lon": 139.313
+      },
+      {
+        "code": "14203",
+        "name": "平塚市",
+        "name_en": "Hiratsuka",
+        "total": 56.5,
+        "macro": 27,
+        "station": 29.5,
+        "lat": 35.3276,
+        "lon": 139.3491
+      }
+    ],
+    "count": 13,
+    "center": {
+      "lat": 35.36179230769231,
+      "lon": 139.41711538461539
+    },
+    "bounds": {
+      "minLat": 35.258599999999994,
+      "maxLat": 35.5009,
+      "minLon": 139.101,
+      "maxLon": 139.6902
+    }
+  }
+}
