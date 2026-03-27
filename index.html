@@ -13,16 +13,16 @@
     }
 
     :root {
-      --bg: #0b0d13;
-      --bg2: #12141c;
-      --bg3: #191c26;
-      --bg4: #21242f;
-      --tx: #e8e6df;
-      --tx2: #9b9a94;
-      --tx3: #6b6a66;
-      --acc: #c97b3a;
-      --acc2: #e8a04c;
-      --brd: rgba(255, 255, 255, .06);
+      --bg: #f5f7fa;
+      --bg2: #ffffff;
+      --bg3: #edf1f7;
+      --bg4: #dae3ee;
+      --tx: #1A3260;
+      --tx2: #3d5a80;
+      --tx3: #7a8da6;
+      --acc: #4590B8;
+      --acc2: #1A3260;
+      --brd: rgba(26, 50, 96, .1);
       --font: 'Segoe UI', system-ui, sans-serif;
       --mono: 'Courier New', monospace
     }
@@ -66,8 +66,8 @@
     }
 
     .badge {
-      background: rgba(201, 123, 58, .12);
-      color: var(--acc2);
+      background: #C2D1EE;
+      color: #1A3260;
       font-size: 10px;
       font-weight: 700;
       padding: 3px 10px;
@@ -90,9 +90,10 @@
 
     .card {
       background: var(--bg2);
-      border: 1px solid var(--brd);
+      border: 1px solid rgba(26, 50, 96, .12);
       border-radius: 10px;
-      overflow: hidden
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(26, 50, 96, .06)
     }
 
     .card-h {
@@ -129,9 +130,9 @@
     }
 
     .flt button {
-      background: var(--bg3);
-      border: 1px solid var(--brd);
-      color: var(--tx2);
+      background: #edf1f7;
+      border: 1px solid rgba(26, 50, 96, .1);
+      color: #3d5a80;
       font-size: 11px;
       font-family: var(--font);
       padding: 4px 10px;
@@ -141,20 +142,20 @@
     }
 
     .flt button:hover {
-      border-color: rgba(255, 255, 255, .15);
-      color: var(--tx)
+      border-color: #4590B8;
+      color: #1A3260
     }
 
     .flt button.on {
-      background: rgba(201, 123, 58, .12);
-      border-color: var(--acc);
-      color: var(--acc2)
+      background: #C2D1EE;
+      border-color: #4590B8;
+      color: #1A3260
     }
 
     .mode-btns {
       display: flex;
       gap: 2px;
-      background: var(--bg3);
+      background: #DAE9F1;
       border-radius: 8px;
       padding: 2px
     }
@@ -177,9 +178,9 @@
     }
 
     .mode-btns button.on {
-      background: var(--bg);
-      color: var(--tx);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, .3)
+      background: #fff;
+      color: #1A3260;
+      box-shadow: 0 1px 3px rgba(26, 50, 96, .15)
     }
 
     .map-wrap {
@@ -217,13 +218,13 @@
     .tt {
       position: fixed;
       pointer-events: none;
-      background: var(--bg3);
-      border: 1px solid var(--brd);
+      background: #fff;
+      border: 1px solid rgba(26, 50, 96, .15);
       border-radius: 8px;
       padding: 10px 14px;
       font-size: 12px;
       z-index: 100;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+      box-shadow: 0 4px 20px rgba(26, 50, 96, .15);
       max-width: 260px;
       opacity: 0;
       transition: opacity .1s
@@ -263,11 +264,11 @@
     }
 
     .tt .tr.active-metric .tl {
-      color: var(--acc2)
+      color: #4590B8
     }
 
     .tt .tr.active-metric .tv {
-      color: var(--acc2)
+      color: #4590B8
     }
 
     .srch {
@@ -277,9 +278,9 @@
 
     .srch input {
       width: 100%;
-      background: var(--bg3);
-      border: 1px solid var(--brd);
-      color: var(--tx);
+      background: #edf1f7;
+      border: 1px solid rgba(26, 50, 96, .12);
+      color: #1A3260;
       font-family: var(--font);
       font-size: 11px;
       padding: 6px 10px 6px 28px;
@@ -288,7 +289,7 @@
     }
 
     .srch input:focus {
-      border-color: var(--acc)
+      border-color: #4590B8
     }
 
     .srch svg {
@@ -303,7 +304,7 @@
       max-height: 500px;
       overflow-y: auto;
       scrollbar-width: thin;
-      scrollbar-color: var(--bg4) transparent
+      scrollbar-color: #C2D1EE transparent
     }
 
     .rtbl::-webkit-scrollbar {
@@ -311,7 +312,7 @@
     }
 
     .rtbl::-webkit-scrollbar-thumb {
-      background: var(--bg4);
+      background: #C2D1EE;
       border-radius: 2px
     }
 
@@ -343,7 +344,7 @@
     }
 
     .rtbl th.sorted {
-      color: var(--acc2)
+      color: #4590B8
     }
 
     .rtbl td {
@@ -354,12 +355,12 @@
     }
 
     .rtbl tr:hover td {
-      background: var(--bg3);
-      color: var(--tx)
+      background: #DAE9F1;
+      color: #1A3260
     }
 
     .rtbl tr.hl td {
-      background: rgba(201, 123, 58, .08)
+      background: #C2D1EE
     }
 
     .rk {
@@ -420,8 +421,8 @@
     }
 
     .met {
-      background: var(--bg2);
-      border: 1px solid var(--brd);
+      background: #fff;
+      border: 1px solid rgba(26, 50, 96, .1);
       border-radius: 8px;
       padding: 10px 12px
     }
@@ -444,17 +445,17 @@
 
 <body>
   <div id="gate"
-    style="position:fixed;inset:0;z-index:9999;background:#0b0d13;display:flex;align-items:center;justify-content:center">
+    style="position:fixed;inset:0;z-index:9999;background:#1A3260;display:flex;align-items:center;justify-content:center">
     <div style="text-align:center">
-      <div style="font-size:11px;letter-spacing:2px;color:#c97b3a;margin-bottom:24px;font-weight:700">ASTRO RESIDENTIAL
+      <div style="font-size:11px;letter-spacing:2px;color:#C2D1EE;margin-bottom:24px;font-weight:700">ASTRO RESIDENTIAL
         FUND</div>
-      <div style="font-size:14px;color:#9b9a94;margin-bottom:16px">Enter access code</div>
+      <div style="font-size:14px;color:#DAE9F1;margin-bottom:16px">Enter access code</div>
       <input id="pw" type="password" autofocus
-        style="background:#191c26;border:1px solid rgba(255,255,255,.1);color:#e8e6df;font-size:16px;padding:10px 20px;border-radius:8px;text-align:center;outline:none;width:220px;font-family:monospace"
+        style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;padding:10px 20px;border-radius:8px;text-align:center;outline:none;width:220px;font-family:monospace"
         onkeydown="if(event.key==='Enter')chk()">
       <br><button onclick="chk()"
-        style="margin-top:12px;background:rgba(201,123,58,.15);border:1px solid #c97b3a;color:#e8a04c;font-size:12px;padding:8px 28px;border-radius:8px;cursor:pointer;font-weight:600">Enter</button>
-      <div id="pw-err" style="color:#e24b4a;font-size:12px;margin-top:10px;opacity:0">Incorrect code</div>
+        style="margin-top:12px;background:rgba(255,255,255,.15);border:1px solid #C2D1EE;color:#fff;font-size:12px;padding:8px 28px;border-radius:8px;cursor:pointer;font-weight:600">Enter</button>
+      <div id="pw-err" style="color:#C44E3F;font-size:12px;margin-top:10px;opacity:0">Incorrect code</div>
     </div>
   </div>
   <script>
@@ -559,7 +560,7 @@
 
     const PREFS = ['東京', '神奈', '埼玉', '千葉', '茨城'];
     const PF = { '東京': '東京都', '神奈': '神奈川県', '埼玉': '埼玉県', '千葉': '千葉県', '茨城': '茨城県' };
-    const PC = { '東京': '#e24b4a', '神奈': '#5aa8e8', '埼玉': '#5dca85', '千葉': '#e8a04c', '茨城': '#9b8bdb' };
+    const PC = { '東京': '#C44E3F', '神奈': '#4590B8', '埼玉': '#3A8A5C', '千葉': '#D4883E', '茨城': '#7B6DAF' };
 
     let activePref = null, hoveredCode = null, highlightCode = null, showStations = false, hoveredStation = null;
     let metric = 'to'; // 'to', 'm', 'tr'
@@ -575,20 +576,20 @@
     // Color scale: adapts to current metric range
     function sc(v, cfg) {
       cfg = cfg || METRIC_CFG[metric];
-      if (v == null) return 'rgba(40,40,50,.3)';
+      if (v == null) return 'rgba(194,209,238,.3)';
       const t = Math.max(0, Math.min(1, (v - cfg.min) / (cfg.max - cfg.min)));
       let r, g, b;
-      if (t < 0.5) { const s = t * 2; r = Math.round(40 + s * 200); g = Math.round(60 + s * 180); b = Math.round(160 - s * 100) }
-      else { const s = (t - 0.5) * 2; r = Math.round(240 - s * 30); g = Math.round(240 - s * 160); b = Math.round(60 - s * 40) }
+      if (t < 0.5) { const s = t * 2; r = Math.round(26 + s * (69 - 26)); g = Math.round(50 + s * (144 - 50)); b = Math.round(96 + s * (184 - 96)) }
+      else { const s = (t - 0.5) * 2; r = Math.round(69 + s * (196 - 69)); g = Math.round(144 + s * (78 - 144)); b = Math.round(184 + s * (63 - 184)) }
       return `rgb(${r},${g},${b})`;
     }
     function sca(v, a, cfg) {
       cfg = cfg || METRIC_CFG[metric];
-      if (v == null) return `rgba(40,40,50,${a})`;
+      if (v == null) return `rgba(194,209,238,${a})`;
       const t = Math.max(0, Math.min(1, (v - cfg.min) / (cfg.max - cfg.min)));
       let r, g, b;
-      if (t < 0.5) { const s = t * 2; r = Math.round(40 + s * 200); g = Math.round(60 + s * 180); b = Math.round(160 - s * 100) }
-      else { const s = (t - 0.5) * 2; r = Math.round(240 - s * 30); g = Math.round(240 - s * 160); b = Math.round(60 - s * 40) }
+      if (t < 0.5) { const s = t * 2; r = Math.round(26 + s * (69 - 26)); g = Math.round(50 + s * (144 - 50)); b = Math.round(96 + s * (184 - 96)) }
+      else { const s = (t - 0.5) * 2; r = Math.round(69 + s * (196 - 69)); g = Math.round(144 + s * (78 - 144)); b = Math.round(184 + s * (63 - 184)) }
       return `rgba(${r},${g},${b},${a})`;
     }
 
@@ -613,8 +614,8 @@
         `<div class="met"><div class="ml">Scored</div><div class="mv">${vals.length}<span style="font-size:12px;color:var(--tx3)"> / ${DATA.length}</span></div></div>` +
         `<div class="met"><div class="ml">Avg ${cfg.label}</div><div class="mv" style="color:${sc(+avg)}">${avg}</div></div>` +
         `<div class="met"><div class="ml">#1</div><div class="mv" style="color:var(--acc2);font-size:16px">${top.n}</div></div>` +
-        `<div class="met"><div class="ml">Max</div><div class="mv" style="color:#5dca85">${getVal(top)}</div></div>` +
-        `<div class="met"><div class="ml">Min</div><div class="mv" style="color:#e24b4a">${getVal(bot)}</div></div>`;
+        `<div class="met"><div class="ml">Max</div><div class="mv" style="color:#3A8A5C">${getVal(top)}</div></div>` +
+        `<div class="met"><div class="ml">Min</div><div class="mv" style="color:#C44E3F">${getVal(bot)}</div></div>`;
     }
 
     // Mode buttons
@@ -719,12 +720,12 @@
         }
 
         if (!isActive) {
-          ctx.fillStyle = 'rgba(30,32,42,.6)';
-          ctx.strokeStyle = 'rgba(255,255,255,.03)'; ctx.lineWidth = 0.3;
+          ctx.fillStyle = 'rgba(218,233,241,.5)';
+          ctx.strokeStyle = 'rgba(26,50,96,.08)'; ctx.lineWidth = 0.3;
         } else {
           ctx.fillStyle = sc(val);
-          ctx.strokeStyle = isHov || isHl ? '#fff' : 'rgba(0,0,0,.4)';
-          ctx.lineWidth = isHov || isHl ? 2 : 0.4;
+          ctx.strokeStyle = isHov || isHl ? '#1A3260' : 'rgba(255,255,255,.6)';
+          ctx.lineWidth = isHov || isHl ? 2.5 : 0.5;
         }
         ctx.fill(); ctx.stroke();
 
@@ -737,7 +738,7 @@
           const label = name + valStr;
           ctx.font = 'bold 11px system-ui';
           const tw = ctx.measureText(label).width;
-          ctx.fillStyle = 'rgba(0,0,0,.75)';
+          ctx.fillStyle = 'rgba(26,50,96,.85)';
           ctx.fillRect(cx - tw / 2 - 5, cy - 9, tw + 10, 18);
           ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
           ctx.fillText(label, cx, cy);
@@ -761,16 +762,16 @@
             const sx = px(s.lo), sy = py(s.la);
             if (sx < -radius || sx > W + radius || sy < -radius || sy > H + radius) continue;
             const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, radius);
-            grad.addColorStop(0, `rgba(255,220,120,${alpha})`);
-            grad.addColorStop(0.5, `rgba(255,200,80,${alpha * 0.5})`);
-            grad.addColorStop(1, 'rgba(255,180,60,0)');
+            grad.addColorStop(0, `rgba(26,50,96,${alpha})`);
+            grad.addColorStop(0.5, `rgba(69,144,184,${alpha * 0.5})`);
+            grad.addColorStop(1, 'rgba(69,144,184,0)');
             ctx.beginPath(); ctx.arc(sx, sy, radius, 0, Math.PI * 2);
             ctx.fillStyle = grad; ctx.fill();
           }
         }
         // Draw station dots on top
         const dotR = [0, 3.5, 2, 1.5, 1];
-        const dotC = [0, 'rgba(255,200,60,0.95)', 'rgba(255,190,50,0.7)', 'rgba(255,180,50,0.45)', 'rgba(255,170,50,0.25)'];
+        const dotC = [0, 'rgba(26,50,96,0.9)', 'rgba(69,144,184,0.7)', 'rgba(69,144,184,0.45)', 'rgba(194,209,238,0.5)'];
         for (const s of STN) {
           const sx = px(s.lo), sy = py(s.la);
           if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
@@ -784,7 +785,7 @@
           const label = hoveredStation.s + ' (' + tl[hoveredStation.t] + ')';
           ctx.font = 'bold 10px system-ui';
           const tw = ctx.measureText(label).width;
-          ctx.fillStyle = 'rgba(0,0,20,.85)';
+          ctx.fillStyle = 'rgba(26,50,96,.9)';
           ctx.fillRect(sx - tw / 2 - 4, sy - 18, tw + 8, 15);
           ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
           ctx.fillText(label, sx, sy - 11);
@@ -909,11 +910,11 @@
       options: {
         responsive: true, maintainAspectRatio: false,
         scales: {
-          x: { title: { display: true, text: 'Macro', color: '#6b6a66', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#6b6a66', font: { size: 9 } }, min: 0, max: 55 },
-          y: { title: { display: true, text: 'Station', color: '#6b6a66', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#6b6a66', font: { size: 9 } }, min: 0, max: 55 }
+          x: { title: { display: true, text: 'Macro', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 },
+          y: { title: { display: true, text: 'Station', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 }
         },
         plugins: {
-          legend: { position: 'top', labels: { boxWidth: 8, padding: 10, color: '#9b9a94', font: { size: 10 } } },
+          legend: { position: 'top', labels: { boxWidth: 8, padding: 10, color: '#3d5a80', font: { size: 10 } } },
           tooltip: { callbacks: { label: c => `${c.raw.label}: M=${c.raw.x} S=${c.raw.y}` } }
         }
       }
@@ -938,8 +939,8 @@
         options: {
           responsive: true, maintainAspectRatio: false,
           scales: {
-            x: { grid: { display: false }, ticks: { color: '#6b6a66', font: { size: 9 } }, title: { display: true, text: cfg.label, color: '#6b6a66', font: { size: 10 } } },
-            y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#6b6a66', font: { size: 9 } }, title: { display: true, text: 'Count', color: '#6b6a66', font: { size: 10 } } }
+            x: { grid: { display: false }, ticks: { color: '#7a8da6', font: { size: 9 } }, title: { display: true, text: cfg.label, color: '#7a8da6', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, title: { display: true, text: 'Count', color: '#7a8da6', font: { size: 10 } } }
           },
           plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw} municipalities` } } }
         }
