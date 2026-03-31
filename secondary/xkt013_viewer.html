@@ -408,7 +408,9 @@
                 case 'total':
                     // Population change ratio vs 2020
                     if (popTotal != null && pop2020 != null && pop2020 > 0) {
-                        return ((popTotal / pop2020) - 1) * 100; // percentage change
+                        const pop2025 = findVal('PT02_2025') || findVal('PT01_2025');
+                        if (popTotal != null && pop2025 != null && pop2025 > 0) return ((popTotal / pop2025) - 1) * 100;
+                        return null;
                     }
                     // If values are already index (base=100), adjust
                     if (popTotal != null && popTotal < 500) {
@@ -447,10 +449,10 @@
                     const t = Math.max(0, Math.min(1, (v + 50) / 100));
                     if (t < 0.5) {
                         const s = t * 2;
-                        return `rgba(${200 - s * 100},${50 + s * 150},${50 + s * 150},0.6)`;
+                        return `rgba(${180 + s * 20},${40 + s * 180},${40 + s * 180},0.65)`;
                     } else {
                         const s = (t - 0.5) * 2;
-                        return `rgba(${100 - s * 60},${200 - s * 60},${100 + s * 155},0.6)`;
+                        return `rgba(${200 - s * 160},${220 - s * 180},${220 - s * 180},0.65)`;
                     }
                 }
             },
