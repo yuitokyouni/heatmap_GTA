@@ -2349,7 +2349,7 @@
         async function loadXKT013Tiles() {
             const badge = document.getElementById('badge-xkt013');
             try {
-                const idxResp = await fetch('cache/xkt013/tile_index.json');
+                const idxResp = await fetch('secondary/cache/xkt013/tile_index.json');
                 if (!idxResp.ok) throw new Error('no index');
                 const tileIndex = await idxResp.json();
                 const tileNames = tileIndex[activeZone];
@@ -2362,7 +2362,7 @@
                     const batch = tileNames.slice(i, i + batchSize);
                     const results = await Promise.all(batch.map(async name => {
                         try {
-                            const r = await fetch(`cache/xkt013/${name}.json`);
+                            const r = await fetch(`secondary/cache/xkt013/${name}.json`);
                             if (!r.ok) return null;
                             const d = await r.json();
                             if (d?.type === 'FeatureCollection') return d.features.map(f => {
