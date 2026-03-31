@@ -473,13 +473,13 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
     """
     print("\n  Building index.html...")
 
-    with open(template_path) as f:
+    with open(template_path, encoding="utf-8") as f:
         template = f.read()
 
-    with open(geo_path) as f:
+    with open(geo_path, encoding="utf-8") as f:
         geo_json = f.read()
 
-    with open(station_path) as f:
+    with open(station_path, encoding="utf-8") as f:
         station_json = f.read()
 
     # Also need to merge score data INTO the GeoJSON properties
