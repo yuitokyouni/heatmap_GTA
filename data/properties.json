@@ -1,0 +1,22 @@
+[
+    {
+        "_comment": "ASTRO 1 Property Template — replace with actual data",
+        "id": "A1-001",
+        "name": "Sample Property",
+        "lat": 35.65,
+        "lon": 139.70,
+        "ward": "渋谷区",
+        "station": "渋谷",
+        "walk_min": 5,
+        "units": 24,
+        "gfa_sqm": 850,
+        "year_built": 2018,
+        "structure": "RC",
+        "rent_avg_k": 95,
+        "occupancy_pct": 97,
+        "cap_rate_pct": 4.2,
+        "irr_pct": 8.5,
+        "acq_price_m": 320,
+        "status": "held"
+    }
+]
