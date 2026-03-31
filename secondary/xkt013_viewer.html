@@ -300,6 +300,20 @@
             zoneBtns.appendChild(btn);
         });
 
+        let tileIndex = null;
+
+        async function loadTileIndex() {
+            if (tileIndex) return tileIndex;
+            try {
+                const resp = await fetch('cache/xkt013/tile_index.json');
+                tileIndex = await resp.json();
+                return tileIndex;
+            } catch (e) {
+                console.error('Failed to load tile index:', e);
+                return null;
+            }
+        }
+
         async function loadZone(zid) {
             activeZone = zid;
             document.querySelectorAll('.zone-btn').forEach((b, i) => {
@@ -309,18 +323,49 @@
             const z = ZONES[zid];
             map.flyTo({ center: z.center, zoom: z.zoom, duration: 600 });
 
-            // Load cached data
-            const path = `cache/xkt013/${zid}.json`;
-            try {
-                const resp = await fetch(path);
-                if (!resp.ok) throw new Error('Not found');
-                currentData = await resp.json();
-                console.log(`Loaded ${zid}: ${currentData.features?.length} features`);
-                renderLayer();
-            } catch (e) {
-                console.error(`Failed to load ${path}:`, e);
-                alert(`Cache file not found: ${path}\nRun: python fetch_reinfolib.py --apikey KEY --layer xkt013 --zone ${zid}`);
+            // Load tile index
+            const idx = await loadTileIndex();
+            if (!idx || !idx[zid]) {
+                alert('Tile index not found. Place tile_index.json in cache/xkt013/');
+                return;
             }
+
+            const tileNames = idx[zid];
+            console.log(`Loading ${tileNames.length} tiles for ${zid}...`);
+
+            // Load tiles in parallel batches
+            const allFeatures = [];
+            let loaded = 0;
+            let errors = 0;
+            const batchSize = 20;
+
+            for (let i = 0; i < tileNames.length; i += batchSize) {
+                const batch = tileNames.slice(i, i + batchSize);
+                const promises = batch.map(async (name) => {
+                    try {
+                        const resp = await fetch(`cache/xkt013/${name}.json`);
+                        if (!resp.ok) return null;
+                        const data = await resp.json();
+                        if (data?.type === 'FeatureCollection') return data.features;
+                        return null;
+                    } catch (e) { return null; }
+                });
+
+                const results = await Promise.all(promises);
+                results.forEach(features => {
+                    if (features) { allFeatures.push(...features); loaded++; }
+                    else errors++;
+                });
+
+                // Progress update
+                const pct = Math.round((i + batch.length) / tileNames.length * 100);
+                document.getElementById('stats-title').textContent = `Loading... ${pct}%`;
+                document.getElementById('stats').style.display = 'block';
+            }
+
+            currentData = { type: 'FeatureCollection', features: allFeatures };
+            console.log(`Loaded ${loaded} tiles, ${errors} errors, ${allFeatures.length} features`);
+            renderLayer();
         }
 
         // ============================================================
