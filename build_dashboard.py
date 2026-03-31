@@ -417,7 +417,7 @@ def build_dashboard_data(results: list) -> str:
     coord_path = SCRIPT_DIR / "geo" / "coordinates.json"
     coords = {}
     if coord_path.exists():
-        with open(coord_path) as f:
+        with open(coord_path, encoding="utf-8") as f:
             for entry in json.load(f):
                 coords[entry["c"]] = entry
 
@@ -508,7 +508,7 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
     # Inject zones data if available
     zones_path = SCRIPT_DIR / "secondary" / "zones.json"
     if zones_path.exists():
-        with open(zones_path) as f:
+        with open(zones_path, encoding="utf-8") as f:
             zones_data = f.read()
         html = html.replace("/*__ZONES_DATA__*/null", zones_data)
         print(f"    Zones:    {len(zones_data)/1024:.0f} KB")
