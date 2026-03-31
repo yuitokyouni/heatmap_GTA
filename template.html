@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ASTRO Heatmap 2026</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    :root {
+      --bg: #f5f7fa;
+      --bg2: #ffffff;
+      --bg3: #edf1f7;
+      --bg4: #dae3ee;
+      --tx: #1A3260;
+      --tx2: #3d5a80;
+      --tx3: #7a8da6;
+      --acc: #4590B8;
+      --acc2: #1A3260;
+      --brd: rgba(26, 50, 96, .1);
+      --font: 'Segoe UI', system-ui, sans-serif;
+      --mono: 'Courier New', monospace
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--tx);
+      font-family: var(--font);
+      overflow-x: hidden
+    }
+
+    .dash {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 20px
+    }
+
+    .hdr {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .hdr h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -.3px
+    }
+
+    .hdr h1 span {
+      color: var(--acc2)
+    }
+
+    .hdr .sub {
+      font-size: 12px;
+      color: var(--tx2);
+      margin-top: 2px
+    }
+
+    .badge {
+      background: #C2D1EE;
+      color: #1A3260;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 16px;
+      letter-spacing: .4px
+    }
+
+    .top {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 12px;
+      margin-bottom: 12px
+    }
+
+    @media(max-width:900px) {
+      .top {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .card {
+      background: var(--bg2);
+      border: 1px solid rgba(26, 50, 96, .12);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(26, 50, 96, .06)
+    }
+
+    .card-h {
+      padding: 12px 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .card-h h2 {
+      font-size: 13px;
+      font-weight: 600
+    }
+
+    .card-h .tag {
+      font-size: 10px;
+      color: var(--tx3);
+      background: var(--bg3);
+      padding: 2px 8px;
+      border-radius: 10px
+    }
+
+    .card-b {
+      padding: 10px 16px 16px
+    }
+
+    .flt {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      padding: 8px 16px 0
+    }
+
+    .flt button {
+      background: #edf1f7;
+      border: 1px solid rgba(26, 50, 96, .1);
+      color: #3d5a80;
+      font-size: 11px;
+      font-family: var(--font);
+      padding: 4px 10px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: .15s
+    }
+
+    .flt button:hover {
+      border-color: #4590B8;
+      color: #1A3260
+    }
+
+    .flt button.on {
+      background: #C2D1EE;
+      border-color: #4590B8;
+      color: #1A3260
+    }
+
+    .mode-btns {
+      display: flex;
+      gap: 2px;
+      background: #DAE9F1;
+      border-radius: 8px;
+      padding: 2px
+    }
+
+    .mode-btns button {
+      background: transparent;
+      border: none;
+      color: var(--tx3);
+      font-size: 11px;
+      font-family: var(--font);
+      padding: 5px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: .15s;
+      font-weight: 600
+    }
+
+    .mode-btns button:hover {
+      color: var(--tx)
+    }
+
+    .mode-btns button.on {
+      background: #fff;
+      color: #1A3260;
+      box-shadow: 0 1px 3px rgba(26, 50, 96, .15)
+    }
+
+    .map-wrap {
+      position: relative;
+      height: 560px
+    }
+
+    #mc {
+      width: 100%;
+      height: 100%;
+      cursor: crosshair
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--tx3);
+      padding: 6px 16px
+    }
+
+    .lgb {
+      display: flex;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      width: 140px
+    }
+
+    .lgb span {
+      flex: 1
+    }
+
+    .tt {
+      position: fixed;
+      pointer-events: none;
+      background: #fff;
+      border: 1px solid rgba(26, 50, 96, .15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(26, 50, 96, .15);
+      max-width: 320px;
+      opacity: 0;
+      transition: opacity .1s
+    }
+
+    .tt.show {
+      opacity: 1
+    }
+
+    .tt .tc {
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 2px
+    }
+
+    .tt .tp {
+      color: var(--tx3);
+      font-size: 10px;
+      margin-bottom: 6px
+    }
+
+    .tt .tr {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 2px 0
+    }
+
+    .tt .tl {
+      color: var(--tx3)
+    }
+
+    .tt .tv {
+      font-family: var(--mono);
+      font-weight: 600;
+      font-size: 11px
+    }
+
+    .tt .tr.active-metric .tl {
+      color: #4590B8
+    }
+
+    .tt .tr.active-metric .tv {
+      color: #4590B8
+    }
+
+    .srch {
+      position: relative;
+      margin-bottom: 8px
+    }
+
+    .srch input {
+      width: 100%;
+      background: #edf1f7;
+      border: 1px solid rgba(26, 50, 96, .12);
+      color: #1A3260;
+      font-family: var(--font);
+      font-size: 11px;
+      padding: 6px 10px 6px 28px;
+      border-radius: 8px;
+      outline: none
+    }
+
+    .srch input:focus {
+      border-color: #4590B8
+    }
+
+    .srch svg {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: .4
+    }
+
+    .rtbl {
+      max-height: 500px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #C2D1EE transparent
+    }
+
+    .rtbl::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .rtbl::-webkit-scrollbar-thumb {
+      background: #C2D1EE;
+      border-radius: 2px
+    }
+
+    .rtbl table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px
+    }
+
+    .rtbl th {
+      position: sticky;
+      top: 0;
+      background: var(--bg2);
+      color: var(--tx3);
+      font-weight: 500;
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--brd);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      z-index: 1;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .rtbl th:hover {
+      color: var(--tx)
+    }
+
+    .rtbl th.sorted {
+      color: #4590B8
+    }
+
+    .rtbl td {
+      padding: 5px 8px;
+      border-bottom: 1px solid var(--brd);
+      color: var(--tx2);
+      white-space: nowrap
+    }
+
+    .rtbl tr:hover td {
+      background: #DAE9F1;
+      color: #1A3260
+    }
+
+    .rtbl tr.hl td {
+      background: #C2D1EE
+    }
+
+    .rk {
+      font-family: var(--mono);
+      color: var(--tx3);
+      font-size: 10px
+    }
+
+    .cn {
+      color: var(--tx);
+      font-weight: 600
+    }
+
+    .sb {
+      display: inline-block;
+      height: 3px;
+      border-radius: 2px;
+      margin-right: 4px;
+      vertical-align: middle
+    }
+
+    .sp {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 8px;
+      min-width: 32px;
+      text-align: center
+    }
+
+    .pb {
+      display: inline-block;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 6px;
+      font-weight: 600
+    }
+
+    .bot {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    @media(max-width:900px) {
+      .bot {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px
+    }
+
+    .met {
+      background: #fff;
+      border: 1px solid rgba(26, 50, 96, .1);
+      border-radius: 8px;
+      padding: 10px 12px
+    }
+
+    .met .ml {
+      font-size: 10px;
+      color: var(--tx3);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 4px
+    }
+
+    .met .mv {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: var(--mono)
+    }
+
+    .factors {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 6px 16px;
+      border-top: 1px solid var(--brd)
+    }
+
+    .factors label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--tx2);
+      cursor: pointer;
+      user-select: none
+    }
+
+    .factors input {
+      accent-color: #4590B8;
+      margin: 0
+    }
+
+    .zone-tabs {
+      display: flex;
+      gap: 3px;
+      padding: 12px 0 8px;
+      flex-wrap: wrap
+    }
+
+    .zone-tabs button {
+      background: #edf1f7;
+      border: 1px solid rgba(26, 50, 96, .1);
+      color: #3d5a80;
+      font-size: 11px;
+      font-family: var(--font);
+      padding: 5px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: .15s;
+      font-weight: 500
+    }
+
+    .zone-tabs button:hover {
+      border-color: #4590B8;
+      color: #1A3260
+    }
+
+    .zone-tabs button.on {
+      background: #1A3260;
+      border-color: #1A3260;
+      color: #fff;
+      font-weight: 600
+    }
+
+    .zone-tabs button .zcnt {
+      font-size: 9px;
+      opacity: .7;
+      margin-left: 3px
+    }
+  </style>
+</head>
+
+<body>
+  <div id="gate"
+    style="position:fixed;inset:0;z-index:9999;background:#1A3260;display:flex;align-items:center;justify-content:center">
+    <div style="text-align:center">
+      <div style="font-size:11px;letter-spacing:2px;color:#C2D1EE;margin-bottom:24px;font-weight:700">ASTRO RESIDENTIAL
+        FUND</div>
+      <div style="font-size:14px;color:#DAE9F1;margin-bottom:16px">Enter access code</div>
+      <input id="pw" type="password" autofocus
+        style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;padding:10px 20px;border-radius:8px;text-align:center;outline:none;width:220px;font-family:monospace"
+        onkeydown="if(event.key==='Enter')chk()">
+      <br><button onclick="chk()"
+        style="margin-top:12px;background:rgba(255,255,255,.15);border:1px solid #C2D1EE;color:#fff;font-size:12px;padding:8px 28px;border-radius:8px;cursor:pointer;font-weight:600">Enter</button>
+      <div id="pw-err" style="color:#C44E3F;font-size:12px;margin-top:10px;opacity:0">Incorrect code</div>
+    </div>
+  </div>
+  <script>
+    async function hashStr(s) { const e = new TextEncoder().encode(s); const h = await crypto.subtle.digest('SHA-256', e); return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('') }
+    async function chk() {
+      const v = document.getElementById('pw').value;
+      const h = await hashStr(v);
+      if (h === '59c01efdcf1b63e7709325d63183f1b0e03e01c8afca97a49904919e0b942bd2') { document.getElementById('gate').remove() }
+      else { document.getElementById('pw-err').style.opacity = '1'; document.getElementById('pw').value = ''; setTimeout(() => document.getElementById('pw-err').style.opacity = '0', 2000) }
+    }
+  </script>
+  <div class="dash">
+    <div class="hdr">
+      <div>
+        <h1>ASTRO <span>Heatmap</span> 2026</h1>
+        <div class="sub">Choropleth — 297 Kantō municipalities scored on Macro + Station metrics</div>
+      </div>
+      <div class="badge">◆ ASTRO RESIDENTIAL FUND</div>
+    </div>
+    <div class="zone-tabs" id="zone-tabs">
+      <button class="on" data-zone="all">All Kantō<span class="zcnt">297</span></button>
+    </div>
+    <div class="metrics" id="mets"></div>
+    <div class="top">
+      <div class="card">
+        <div class="card-h">
+          <h2>Score choropleth</h2>
+          <div class="mode-btns" id="mode-btns">
+            <button class="on" data-m="to">Total</button>
+            <button data-m="m">Macro</button>
+            <button data-m="tr">Station</button>
+          </div>
+          <label
+            style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2);cursor:pointer;user-select:none">
+            <input type="checkbox" id="stn-toggle"
+              onchange="showStations=this.checked;document.getElementById('stn-legend').style.display=this.checked?'inline':'none';drawMap()"
+              style="accent-color:var(--acc)">
+            Stations
+          </label>
+          <div class="tag" id="mt">297 polygons</div>
+        </div>
+        <div class="flt" id="flt"></div>
+        <div class="factors" id="factors">
+          <span style="font-size:10px;color:var(--tx3);font-weight:600">Factors:</span>
+          <label><input type="checkbox" checked data-f="pop">Population</label>
+          <label><input type="checkbox" checked data-f="u20">Under 20</label>
+          <label><input type="checkbox" checked data-f="a39">Age 20-39</label>
+          <label><input type="checkbox" checked data-f="inc">Income</label>
+          <label><input type="checkbox" checked data-f="saf">Safety</label>
+        </div>
+        <div class="map-wrap">
+          <canvas id="mc"></canvas>
+          <div style="position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:4px;z-index:10">
+            <button onclick="zoomMap(1.3)"
+              style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(26,50,96,.15);background:#fff;color:#1A3260;font-size:16px;cursor:pointer;font-weight:700;box-shadow:0 1px 4px rgba(26,50,96,.1)">+</button>
+            <button onclick="zoomMap(1/1.3)"
+              style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(26,50,96,.15);background:#fff;color:#1A3260;font-size:16px;cursor:pointer;font-weight:700;box-shadow:0 1px 4px rgba(26,50,96,.1)">−</button>
+            <button onclick="resetZoom()"
+              style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(26,50,96,.15);background:#fff;color:#1A3260;font-size:11px;cursor:pointer;font-weight:600;box-shadow:0 1px 4px rgba(26,50,96,.1)">⟲</button>
+          </div>
+        </div>
+        <div class="legend" id="leg-wrap"><span id="leg-lo">9</span>
+          <div class="lgb" id="lgb"></div><span id="leg-hi">97</span><span style="margin-left:10px;font-style:italic"
+            id="leg-label">Total score</span>
+          <span id="stn-legend"
+            style="display:none;margin-left:16px;border-left:1px solid var(--brd);padding-left:12px">
+            <span style="display:inline-flex;align-items:center;gap:2px"><span
+                style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1A3260;vertical-align:middle"></span>Terminal</span>
+            <span style="display:inline-flex;align-items:center;gap:2px;margin-left:6px"><span
+                style="display:inline-block;width:6px;height:6px;border-radius:50%;background:rgba(26,50,96,.85);vertical-align:middle"></span>Hub</span>
+            <span style="display:inline-flex;align-items:center;gap:2px;margin-left:6px"><span
+                style="display:inline-block;width:5px;height:5px;border-radius:50%;background:rgba(69,144,184,.7);vertical-align:middle"></span>JR</span>
+            <span style="display:inline-flex;align-items:center;gap:2px;margin-left:6px"><span
+                style="display:inline-block;width:4px;height:4px;border-radius:50%;background:rgba(69,144,184,.45);vertical-align:middle"></span>Pvt</span>
+            <span style="display:inline-flex;align-items:center;gap:2px;margin-left:6px"><span
+                style="display:inline-block;width:3px;height:3px;border-radius:50%;background:rgba(194,209,238,.5);vertical-align:middle"></span>Local</span>
+          </span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h">
+          <h2>Ranking</h2>
+          <div class="tag" id="rc">300</div>
+        </div>
+        <div class="card-b">
+          <div class="srch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg><input type="text" id="sq" placeholder="Search..."></div>
+          <div class="rtbl" id="rtbl"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bot">
+      <div class="card">
+        <div class="card-h">
+          <h2>Macro × Station scatter</h2>
+          <div class="tag">By prefecture</div>
+        </div>
+        <div class="card-b">
+          <div style="position:relative;height:300px"><canvas id="scc"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h">
+          <h2>Score distribution</h2>
+          <div class="tag" id="hist-label">Total score</div>
+        </div>
+        <div class="card-b">
+          <div style="position:relative;height:300px"><canvas id="hsc"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tt" id="tt"></div>
+  <div class="prop-popup" id="pp"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    const GEO =/*__GEO_DATA__*/null;
+
+    const DATA =/*__SCORE_DATA__*/null;
+    const STN =/*__STATION_DATA__*/null;
+
+    const PREFS = ['東京', '神奈', '埼玉', '千葉', '茨城'];
+    const PF = { '東京': '東京都', '神奈': '神奈川県', '埼玉': '埼玉県', '千葉': '千葉県', '茨城': '茨城県' };
+    const PC = { '東京': '#C44E3F', '神奈': '#4590B8', '埼玉': '#3A8A5C', '千葉': '#D4883E', '茨城': '#7B6DAF' };
+
+    let activePref = null, hoveredCode = null, highlightCode = null, showStations = false, hoveredStation = null;
+
+    // Zone definitions
+    const ZONES =/*__ZONES_DATA__*/null;
+    let activeZone = 'all';
+    let zoneFilter = null; // set of codes to show, or null for all
+
+    function initZoneTabs() {
+      if (!ZONES) return;
+      const container = document.getElementById('zone-tabs');
+      // Add zone buttons
+      const zoneOrder = ['zone_23ku', 'zone_yokakawa', 'zone_tama', 'zone_saitama', 'zone_chiba_nw', 'zone_chiba_e', 'zone_kanagawa'];
+      zoneOrder.forEach(zid => {
+        const z = ZONES[zid];
+        if (!z) return;
+        const btn = document.createElement('button');
+        btn.dataset.zone = zid;
+        btn.innerHTML = z.name + '<span class="zcnt">' + z.count + '</span>';
+        container.appendChild(btn);
+      });
+      // Click handlers
+      container.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => {
+          container.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+          btn.classList.add('on');
+          activeZone = btn.dataset.zone;
+          if (activeZone === 'all') {
+            zoneFilter = null;
+            // Reset map bounds
+            zoom = 1; panX = 0; panY = 0;
+          } else {
+            const z = ZONES[activeZone];
+            zoneFilter = new Set(z.municipalities.map(m => m.code));
+            // Zoom to zone bounds
+            const b = z.bounds;
+            zoomToBounds(b.minLat, b.maxLat, b.minLon, b.maxLon);
+          }
+          activePref = null;
+          updatePrefButtons();
+          drawMap();
+          updateMetrics();
+          renderRanking();
+          updateHistogram();
+        };
+      });
+    }
+
+    function zoomToBounds(minLat, maxLat, minLon, maxLon) {
+      // Calculate zoom and pan to fit bounds in the canvas
+      const LAT_SCALE_L = Math.cos(((minLat + maxLat) / 2) * Math.PI / 180);
+      const geoW = (maxLon - minLon) * LAT_SCALE_L;
+      const geoH = maxLat - minLat;
+      const baseGeoW = (B.maxLon - B.minLon) * LAT_SCALE;
+      const baseGeoH = B.maxLat - B.minLat;
+
+      // How much to zoom
+      const zx = baseGeoW / geoW * 0.85;
+      const zy = baseGeoH / geoH * 0.85;
+      const newZoom = Math.min(zx, zy);
+
+      // Center coordinates in base projection
+      const cLon = (minLon + maxLon) / 2;
+      const cLat = (minLat + maxLat) / 2;
+
+      // Base projection positions (without zoom)
+      const baseCx = OX + ((cLon - B.minLon) * LAT_SCALE) * S;
+      const baseCy = OY + ((B.maxLat - cLat)) * S;
+
+      zoom = newZoom;
+      panX = W / 2 - baseCx * zoom;
+      panY = H / 2 - baseCy * zoom;
+    }
+
+    function updatePrefButtons() {
+      const fEl = document.getElementById('flt');
+      if (!fEl) return;
+      fEl.querySelectorAll('button').forEach(b => {
+        if (b.textContent === 'All') b.classList.add('on');
+        else b.classList.remove('on');
+      });
+    }
+    let zoom = 1, panX = 0, panY = 0, isPanning = false, panStartX = 0, panStartY = 0;
+    let metric = 'to'; // 'to', 'm', 'tr'
+    const METRIC_CFG = {
+      to: { label: 'Total score', max: 97, min: 9, maxR: 100, field: 'to', sortKey: 'to' },
+      m: { label: 'Macro score', max: 49, min: 6, maxR: 50, field: 'm', sortKey: 'm' },
+      tr: { label: 'Station score', max: 50, min: 5, maxR: 50, field: 'tr', sortKey: 'tr' }
+    };
+
+    const tt = document.getElementById('tt');
+    if (!DATA || !GEO || !STN) { document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;color:#1A3260"><h2>Template file</h2><p>This is the template. Run <code>python build_dashboard.py</code> to generate index.html</p></div>'; throw new Error('No data — this is the template file') }
+    const SL = {}; DATA.forEach(d => { SL[d.c] = d });
+
+    // Pre-compute ranks for each factor
+    const RANK = {};
+    ['to', 'm', 'tr', 'sp', 'su', 'sa', 'si', 'ss'].forEach(field => {
+      const sorted = [...DATA].filter(d => d[field] != null && d[field] > 0).sort((a, b) => b[field] - a[field]);
+      sorted.forEach((d, i) => { if (!RANK[d.c]) RANK[d.c] = {}; RANK[d.c][field] = i + 1 });
+    });
+    const TOTAL_RANKED = DATA.filter(d => d.to != null).length;
+
+    // Color scale: adapts to current metric range
+    function sc(v, cfg) {
+      cfg = cfg || METRIC_CFG[metric];
+      if (v == null) return 'rgba(194,209,238,.35)';
+      const t = Math.max(0, Math.min(1, (v - cfg.min) / (cfg.max - cfg.min)));
+      let r, g, b;
+      if (t < 0.5) { const s = t * 2; r = Math.round(20 + s * (255 - 20)); g = Math.round(60 + s * (220 - 60)); b = Math.round(140 + s * (50 - 140)) }
+      else { const s = (t - 0.5) * 2; r = Math.round(255 + s * (210 - 255)); g = Math.round(220 + s * (45 - 220)); b = Math.round(50 + s * (35 - 50)) }
+      return `rgb(${r},${g},${b})`;
+    }
+    function sca(v, a, cfg) {
+      cfg = cfg || METRIC_CFG[metric];
+      if (v == null) return `rgba(194,209,238,${a})`;
+      const t = Math.max(0, Math.min(1, (v - cfg.min) / (cfg.max - cfg.min)));
+      let r, g, b;
+      if (t < 0.5) { const s = t * 2; r = Math.round(20 + s * (255 - 20)); g = Math.round(60 + s * (220 - 60)); b = Math.round(140 + s * (50 - 140)) }
+      else { const s = (t - 0.5) * 2; r = Math.round(255 + s * (210 - 255)); g = Math.round(220 + s * (45 - 220)); b = Math.round(50 + s * (35 - 50)) }
+      return `rgba(${r},${g},${b},${a})`;
+    }
+
+    // Factor toggles
+    const FACTORS = { pop: true, u20: true, a39: true, inc: true, saf: true };
+    function updateFactors() {
+      document.querySelectorAll('#factors input').forEach(cb => {
+        if (cb.dataset.f) FACTORS[cb.dataset.f] = cb.checked;
+      });
+      // Recalculate macro & total for all DATA entries
+      DATA.forEach(d => {
+        if (!d._origM) d._origM = { pop: d.sp || 0, u20: d.su || 0, a39: d.sa || 0, inc: d.si || 0, saf: d.ss || 0, stn: d.tr };
+        const om = d._origM;
+        let macro = 0;
+        if (FACTORS.pop) macro += om.pop;
+        if (FACTORS.u20) macro += om.u20;
+        if (FACTORS.a39) macro += om.a39;
+        if (FACTORS.inc) macro += om.inc;
+        if (FACTORS.saf) macro += om.saf;
+        d.m = macro;
+        if (om.stn != null) { d.to = macro + om.stn } else { d.to = Math.round(macro * 1.5 * 10) / 10 }
+      });
+      // Update GEO properties too
+      GEO.features.forEach(f => {
+        const s = SL[f.properties.c];
+        if (s) { f.properties.to = s.to; f.properties.m = s.m }
+      });
+      updateMetrics(); updateLegend(); drawMap(); renderRanking(); updateHistogram();
+    }
+    document.querySelectorAll('#factors input').forEach(cb => {
+      cb.addEventListener('change', updateFactors);
+    });
+
+    function getVal(d) {
+      const f = METRIC_CFG[metric].field;
+      return d[f] != null ? d[f] : null;
+    }
+    function getValFromProps(p) {
+      const f = METRIC_CFG[metric].field;
+      return p[f] != null ? p[f] : null;
+    }
+
+    // Metrics bar
+    function updateMetrics() {
+      const cfg = METRIC_CFG[metric];
+      const vals = DATA.filter(d => !zoneFilter || zoneFilter.has(d.c)).map(d => getVal(d)).filter(v => v != null);
+      const avg = (vals.reduce((s, v) => s + v, 0) / vals.length).toFixed(1);
+      const srt = [...DATA].filter(d => getVal(d) != null && (!zoneFilter || zoneFilter.has(d.c))).sort((a, b) => getVal(b) - getVal(a));
+      const top = srt[0];
+      const bot = srt[srt.length - 1];
+      document.getElementById('mets').innerHTML =
+        `<div class="met"><div class="ml">Scored</div><div class="mv">${vals.length}<span style="font-size:12px;color:var(--tx3)"> / ${DATA.length}</span></div></div>` +
+        `<div class="met"><div class="ml">Avg ${cfg.label}</div><div class="mv" style="color:${sc(+avg)}">${avg}</div></div>` +
+        `<div class="met"><div class="ml">#1</div><div class="mv" style="color:var(--acc2);font-size:16px">${top.n}</div></div>` +
+        `<div class="met"><div class="ml">Max</div><div class="mv" style="color:#3A8A5C">${getVal(top)}</div></div>` +
+        `<div class="met"><div class="ml">Min</div><div class="mv" style="color:#C44E3F">${getVal(bot)}</div></div>`;
+    }
+
+    // Mode buttons
+    document.getElementById('mode-btns')?.querySelectorAll('button').forEach(b => b.onclick = () => {
+      document.getElementById('mode-btns')?.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      metric = b.dataset.m;
+      onMetricChange();
+    });
+
+    function onMetricChange() {
+      const cfg = METRIC_CFG[metric];
+      updateMetrics();
+      updateLegend();
+      drawMap();
+      renderRanking();
+      updateHistogram();
+      document.getElementById('leg-label').textContent = cfg.label;
+      document.getElementById('hist-label').textContent = cfg.label;
+    }
+
+    // Filters
+    const fEl = document.getElementById('flt');
+    fEl.innerHTML = '<button class="on" data-p="all">All</button>' + PREFS.map(p => `<button data-p="${p}" style="border-left:3px solid ${PC[p]}">${PF[p]}</button>`).join('');
+    fEl?.querySelectorAll('button').forEach(b => b.onclick = () => {
+      fEl?.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on');
+      activePref = b.dataset.p === 'all' ? null : b.dataset.p; drawMap(); renderRanking();
+    });
+
+    // Legend
+    function updateLegend() {
+      const cfg = METRIC_CFG[metric];
+      document.getElementById('leg-lo').textContent = cfg.min;
+      document.getElementById('leg-hi').textContent = cfg.max;
+      const lb = document.getElementById('lgb');
+      lb.innerHTML = '';
+      for (let i = 0; i < 12; i++) { const s = document.createElement('span'); s.style.background = sc(cfg.min + i * (cfg.max - cfg.min) / 11); lb.appendChild(s) }
+    }
+
+    // MAP
+    const canvas = document.getElementById('mc');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    const B = { minLat: 34.95, maxLat: 36.85, minLon: 139.0, maxLon: 140.9 };
+    // Aspect-ratio-correct projection
+    const LAT_SCALE = Math.cos(35.9 * Math.PI / 180); // latitude correction for Mercator
+    let OX = 0, OY = 0, S = 1;
+    function calcProj() {
+      const aspGeo = (B.maxLon - B.minLon) * LAT_SCALE / (B.maxLat - B.minLat);
+      const aspScr = W / H;
+      if (aspScr > aspGeo) { S = H / (B.maxLat - B.minLat); OX = (W - S * (B.maxLon - B.minLon) * LAT_SCALE) / 2; OY = 0 }
+      else { S = W / ((B.maxLon - B.minLon) * LAT_SCALE); OX = 0; OY = (H - S * (B.maxLat - B.minLat)) / 2 }
+    }
+    function px(lon) { return (OX + ((lon - B.minLon) * LAT_SCALE) * S) * zoom + panX }
+    function py(lat) { return (OY + ((B.maxLat - lat)) * S) * zoom + panY }
+
+    let featurePaths = [];
+    function buildPaths() {
+      featurePaths = [];
+      calcProj();
+      for (const f of GEO.features) {
+        const code = f.properties.c;
+        const val = getValFromProps(f.properties);
+        const polys = [];
+        const geom = f.geometry;
+        const coordSets = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates;
+        for (const poly of coordSets) {
+          const rings = [];
+          for (const ring of poly) { rings.push(ring.map(p => ([px(p[0]), py(p[1])]))) }
+          polys.push(rings);
+        }
+        featurePaths.push({ code, val, polys, props: f.properties });
+      }
+    }
+
+    function drawMap() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      canvas.width = W * dpr; canvas.height = H * dpr;
+      canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      buildPaths();
+
+      for (const fp of featurePaths) {
+        // Recompute val for current metric from score lookup
+        const sd = SL[fp.code];
+        const val = sd ? getVal(sd) : null;
+        const isActive = !activePref || fp.props.p === activePref;
+        const isHov = fp.code === hoveredCode;
+        const isHl = fp.code === highlightCode;
+
+        ctx.beginPath();
+        for (const poly of fp.polys) {
+          for (const ring of poly) {
+            if (ring.length < 3) continue;
+            ctx.moveTo(ring[0][0], ring[0][1]);
+            for (let i = 1; i < ring.length; i++)ctx.lineTo(ring[i][0], ring[i][1]);
+            ctx.closePath();
+          }
+        }
+
+        if (!isActive) {
+          ctx.fillStyle = 'rgba(218,233,241,.5)';
+          ctx.strokeStyle = 'rgba(26,50,96,.08)'; ctx.lineWidth = 0.3;
+        } else {
+          ctx.fillStyle = sc(val);
+          ctx.strokeStyle = isHov ? '#1A3260' : isHl ? '#4590B8' : 'rgba(255,255,255,.6)';
+          ctx.lineWidth = isHov ? 1.5 : isHl ? 2 : 0.5;
+        }
+        ctx.fill(); ctx.stroke();
+
+        if (isHov && isActive) {
+          let cx = 0, cy = 0, n = 0;
+          for (const poly of fp.polys) for (const ring of poly) for (const p of ring) { cx += p[0]; cy += p[1]; n++ }
+          cx /= n; cy /= n;
+          const name = fp.props.n;
+          const valStr = val != null ? (' ' + val) : '';
+          const label = name + valStr;
+          ctx.font = 'bold 11px system-ui';
+          const tw = ctx.measureText(label).width;
+          ctx.fillStyle = 'rgba(26,50,96,.85)';
+          ctx.fillRect(cx - tw / 2 - 5, cy - 9, tw + 10, 18);
+          ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(label, cx, cy);
+          ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+        }
+      }
+      // Station overlay — radial influence zones
+      if (showStations) {
+        // Influence radius in pixels (approx: 1km ≈ S*0.009 lat degrees)
+        // Tier 1 Hub: 1.5km, Tier 2 JR: 1.0km, Tier 3 Private: 0.7km, Tier 4 Local: 0.4km
+        const tierKm = [2.0, 1.5, 1.0, 0.7, 0.4];
+        const tierAlpha = [0.22, 0.18, 0.12, 0.08, 0.04];
+        const kmToPx = S * 0.009; // approximate conversion: 1km in projection pixels
+
+        // Draw influence halos (back to front: tier 4 first, tier 1 last)
+        for (let tier = 4; tier >= 1; tier--) {
+          const radius = tierKm[tier] * kmToPx;
+          const alpha = tierAlpha[tier];
+          for (const s of STN) {
+            if (s.t !== tier) continue;
+            const sx = px(s.lo), sy = py(s.la);
+            if (sx < -radius || sx > W + radius || sy < -radius || sy > H + radius) continue;
+            const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, radius);
+            grad.addColorStop(0, `rgba(26,50,96,${alpha})`);
+            grad.addColorStop(0.5, `rgba(69,144,184,${alpha * 0.5})`);
+            grad.addColorStop(1, 'rgba(69,144,184,0)');
+            ctx.beginPath(); ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+            ctx.fillStyle = grad; ctx.fill();
+          }
+        }
+        // Draw station dots on top
+        const dotR = [5, 3.5, 2, 1.5, 1];
+        const dotC = ['rgba(26,50,96,1)', 'rgba(26,50,96,0.9)', 'rgba(69,144,184,0.7)', 'rgba(69,144,184,0.45)', 'rgba(194,209,238,0.5)'];
+        for (const s of STN) {
+          const sx = px(s.lo), sy = py(s.la);
+          if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
+          ctx.beginPath(); ctx.arc(sx, sy, dotR[s.t], 0, Math.PI * 2);
+          ctx.fillStyle = dotC[s.t]; ctx.fill();
+        }
+        // Property pins
+        for (const p of PROPERTIES) {
+          const sx = px(p.lon), sy = py(p.lat);
+          if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
+          // Pin shape
+          ctx.save();
+          ctx.translate(sx, sy);
+          ctx.beginPath();
+          ctx.moveTo(0, -22);
+          ctx.bezierCurveTo(-8, -22, -12, -14, -12, -10);
+          ctx.bezierCurveTo(-12, -4, -2, 2, 0, 6);
+          ctx.bezierCurveTo(2, 2, 12, -4, 12, -10);
+          ctx.bezierCurveTo(12, -14, 8, -22, 0, -22);
+          ctx.closePath();
+          ctx.fillStyle = '#1A3260';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          // Inner dot
+          ctx.beginPath();
+          ctx.arc(0, -12, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff';
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Property hover detection
+        if (!isPanning && PROPERTIES.length > 0) {
+          const rect2 = canvas.getBoundingClientRect();
+          // Check via last mouse position
+        }
+
+        // Station hover label
+        if (hoveredStation) {
+          const sx = px(hoveredStation.lo), sy = py(hoveredStation.la);
+          const tl = ['Terminal', 'Hub', 'JR', 'Private', 'Local'];
+          const label = hoveredStation.s + ' (' + tl[hoveredStation.t] + ')';
+          ctx.font = 'bold 10px system-ui';
+          const tw = ctx.measureText(label).width;
+          ctx.fillStyle = 'rgba(26,50,96,.9)';
+          ctx.fillRect(sx - tw / 2 - 4, sy - 18, tw + 8, 15);
+          ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(label, sx, sy - 11);
+          ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+        }
+      }
+    }
+
+    function hitTest(mx, my) {
+      for (let i = featurePaths.length - 1; i >= 0; i--) {
+        const fp = featurePaths[i];
+        for (const poly of fp.polys) { if (pip(mx, my, poly[0])) return fp }
+      }
+      return null;
+    }
+    function pip(x, y, ring) {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+        if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside;
+      }
+      return inside;
+    }
+
+    function showTT(d, x, y) {
+      const sd = SL[d.code] || {};
+      const cfg = METRIC_CFG[metric];
+      const curVal = sd[cfg.field];
+      const rk = RANK[d.code] || {};
+      const rTot = rk.to ? '#' + rk.to : '—';
+      tt.innerHTML = `<div class="tc">${d.props.n}</div><div class="tp">${PF[d.props.p] || d.props.p}${d.props.e ? ' · ' + d.props.e : ''}</div>` +
+        `<div class="tr${metric === 'to' ? ' active-metric' : ''}"><span class="tl">Total</span><span class="tv" style="color:${sc(sd.to, METRIC_CFG.to)}">${sd.to != null ? sd.to : '—'} <span style="font-size:9px;color:var(--tx3)">${rTot}/${TOTAL_RANKED}</span></span></div>` +
+        `<div class="tr${metric === 'm' ? ' active-metric' : ''}"><span class="tl">Macro</span><span class="tv">${sd.m != null ? sd.m + '/50' : '—'} <span style="font-size:9px;color:var(--tx3)">${rk.m ? '#' + rk.m : '—'}</span></span></div>` +
+        `<div class="tr${metric === 'tr' ? ' active-metric' : ''}"><span class="tl">Station</span><span class="tv">${sd.tr != null ? sd.tr + '/50' : '—'} <span style="font-size:9px;color:var(--tx3)">${rk.tr ? '#' + rk.tr : '—'}</span></span></div>` +
+        `<div style="border-top:1px solid rgba(26,50,96,.08);margin:4px 0;padding-top:4px">` +
+        `<div class="tr"><span class="tl">Population</span><span class="tv">${sd.sp || '—'}/10 <span style="font-size:9px;color:var(--tx3)">${rk.sp ? '#' + rk.sp : ''}</span></span></div>` +
+        `<div class="tr"><span class="tl">Under 20</span><span class="tv">${sd.su || '—'}/10 <span style="font-size:9px;color:var(--tx3)">${rk.su ? '#' + rk.su : ''}</span></span></div>` +
+        `<div class="tr"><span class="tl">Age 20-39</span><span class="tv">${sd.sa || '—'}/10 <span style="font-size:9px;color:var(--tx3)">${rk.sa ? '#' + rk.sa : ''}</span></span></div>` +
+        `<div class="tr"><span class="tl">Income</span><span class="tv">${sd.si || '—'}/10 <span style="font-size:9px;color:var(--tx3)">${rk.si ? '#' + rk.si : ''}</span></span></div>` +
+        `<div class="tr"><span class="tl">Safety</span><span class="tv">${sd.ss || '—'}/10 <span style="font-size:9px;color:var(--tx3)">${rk.ss ? '#' + rk.ss : ''}</span></span></div>` +
+        `</div>`;
+      tt.style.left = Math.min(x + 14, window.innerWidth - 270) + 'px';
+      tt.style.top = (y - 10) + 'px';
+      tt.classList.add('show');
+    }
+
+    function zoomMap(factor) {
+      const cx = W / 2, cy = H / 2;
+      panX = (panX - cx) * factor + cx;
+      panY = (panY - cy) * factor + cy;
+      zoom *= factor;
+      zoom = Math.max(0.5, Math.min(zoom, 8));
+      drawMap();
+    }
+    function resetZoom() { zoom = 1; panX = 0; panY = 0; drawMap() }
+
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      panX = (panX - mx) * factor + mx;
+      panY = (panY - my) * factor + my;
+      zoom *= factor;
+      zoom = Math.max(0.5, Math.min(zoom, 8));
+      drawMap();
+    }, { passive: false });
+
+    canvas.addEventListener('mousedown', e => {
+      if (e.button === 0) { isPanning = true; panStartX = e.clientX - panX; panStartY = e.clientY - panY; canvas.style.cursor = 'grabbing' }
+    });
+    canvas.addEventListener('mouseup', () => { isPanning = false; canvas.style.cursor = 'crosshair' });
+
+    canvas.addEventListener('mousemove', e => {
+      if (isPanning) { panX = e.clientX - panStartX; panY = e.clientY - panStartY; drawMap(); return }
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      // Station hover (check first if stations visible)
+      let newHovStn = null;
+      if (showStations) {
+        let minD = 12;
+        for (const s of STN) {
+          const sx = px(s.lo), sy = py(s.la);
+          const d = Math.hypot(sx - mx, sy - my);
+          if (d < minD) { minD = d; newHovStn = s }
+        }
+      }
+      const stnChanged = newHovStn !== hoveredStation;
+      hoveredStation = newHovStn;
+      // Municipality hover
+      const hit = hitTest(mx, my);
+      const nc = hit ? hit.code : null;
+      if (nc !== hoveredCode || stnChanged) { hoveredCode = nc; drawMap() }
+      if (hoveredStation) {
+        const tl = ['Terminal', 'Hub', 'JR', 'Private', 'Local'];
+        tt.innerHTML = `<div class="tc">${hoveredStation.s}</div><div class="tp">${tl[hoveredStation.t]} station</div>`;
+        tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 200) + 'px';
+        tt.style.top = (e.clientY - 10) + 'px';
+        tt.classList.add('show');
+      } else if (hit) { showTT(hit, e.clientX, e.clientY) }
+      else { tt.classList.remove('show') }
+    });
+    canvas.addEventListener('mouseleave', () => { hoveredCode = null; drawMap(); tt.classList.remove('show') });
+    canvas.addEventListener('click', e => {
+      const rect = canvas.getBoundingClientRect();
+      const hit = hitTest(e.clientX - rect.left, e.clientY - rect.top);
+      highlightCode = hit ? hit.code : null; drawMap();
+      if (hit) {
+        const row = document.querySelector(`tr[data-c="${hit.code}"]`);
+        if (row) {
+          row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          document.querySelectorAll('.rtbl tr.hl').forEach(r => r.classList.remove('hl')); row.classList.add('hl')
+        }
+      }
+    });
+    window.addEventListener('resize', drawMap);
+
+    // RANKING
+    let rankSort = 'metric'; // 'metric' sorts by current metric
+    function renderRanking(q = '') {
+      const ql = q.toLowerCase();
+      const cfg = METRIC_CFG[metric];
+      let list = [...DATA].filter(d => getVal(d) != null).sort((a, b) => getVal(b) - getVal(a));
+      // Append nulls at end
+      const nulls = DATA.filter(d => getVal(d) == null);
+      list = list.concat(nulls);
+      if (activePref) list = list.filter(d => d.p === activePref);
+      if (ql) list = list.filter(d => d.n.includes(ql) || (d.e && d.e.toLowerCase().includes(ql)));
+      document.getElementById('rc').textContent = list.length;
+
+      const sortLabel = { to: 'Total', m: 'Macro', tr: 'Station' }[metric];
+      const html = '<table><thead><tr><th>#</th><th>Municipality</th><th class="sorted">' + sortLabel + '</th><th>M</th><th>S</th></tr></thead><tbody>' +
+        list.map((d, i) => {
+          const bg = PC[d.p] || '#666';
+          const val = getVal(d);
+          const maxR = cfg.maxR;
+          return `<tr data-c="${d.c}" onmouseenter="hoveredCode='${d.c}';drawMap()" onmouseleave="hoveredCode=null;drawMap()">
+        <td class="rk">${val != null ? i + 1 : '—'}</td>
+        <td><span class="cn">${d.n}</span> <span class="pb" style="background:${bg}22;color:${bg}">${PF[d.p] || d.p}</span></td>
+        <td><span class="sb" style="width:${val != null ? val / maxR * 36 : 0}px;background:${sc(val)}"></span><span class="sp" style="background:${sca(val, .15)};color:${sc(val)}">${val != null ? val : '—'}</span></td>
+        <td style="font-family:var(--mono);font-size:10px">${d.m}</td>
+        <td style="font-family:var(--mono);font-size:10px">${d.tr != null ? d.tr : '—'}</td>
+      </tr>`}).join('') + '</tbody></table>';
+      document.getElementById('rtbl').innerHTML = html;
+    }
+    document.getElementById('sq').addEventListener('input', e => renderRanking(e.target.value));
+
+    // SCATTER
+    const scData = DATA.filter(d => d.tr != null);
+    try {
+      new Chart(document.getElementById('scc'), {
+        type: 'scatter',
+        data: {
+          datasets: PREFS.map(p => ({
+            label: PF[p],
+            data: scData.filter(d => d.p === p).map(d => ({ x: d.m, y: d.tr, label: d.n })),
+            backgroundColor: PC[p] + '88', borderColor: PC[p], borderWidth: 1, pointRadius: 3.5, pointHoverRadius: 6
+          }))
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { title: { display: true, text: 'Macro', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 },
+            y: { title: { display: true, text: 'Station', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 }
+          },
+          plugins: {
+            legend: { position: 'top', labels: { boxWidth: 8, padding: 10, color: '#3d5a80', font: { size: 10 } } },
+            tooltip: { callbacks: { label: c => `${c.raw.label}: M=${c.raw.x} S=${c.raw.y}` } }
+          }
+        }
+      })
+    } catch (e) { console.warn('Scatter chart init failed:', e) }
+
+    // HISTOGRAM
+    let histChart = null;
+    function updateHistogram() {
+      // Apply zone filter to histogram
+      const cfg = METRIC_CFG[metric];
+      const vals = DATA.filter(d => !zoneFilter || zoneFilter.has(d.c)).map(d => getVal(d)).filter(v => v != null);
+      const nBins = 10;
+      const range = cfg.max - cfg.min;
+      const bins = Array(nBins).fill(0);
+      vals.forEach(v => { const i = Math.min(nBins - 1, Math.floor((v - cfg.min) / range * nBins)); bins[i]++ });
+      const labels = bins.map((_, i) => { const lo = Math.round(cfg.min + i * range / nBins); const hi = Math.round(cfg.min + (i + 1) * range / nBins); return `${lo}–${hi}` });
+      const colors = bins.map((_, i) => sc(cfg.min + i * range / nBins + (range / nBins / 2)));
+
+      if (histChart) { histChart.destroy() }
+      histChart = new Chart(document.getElementById('hsc'), {
+        type: 'bar',
+        data: { labels, datasets: [{ data: bins, backgroundColor: colors, borderWidth: 0, borderRadius: 3 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#7a8da6', font: { size: 9 } }, title: { display: true, text: cfg.label, color: '#7a8da6', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, title: { display: true, text: 'Count', color: '#7a8da6', font: { size: 10 } } }
+          },
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw} municipalities` } } }
+        }
+      });
+    }
+
+    // Init — load sub-scores for factor toggles
+    // Sub-scores are embedded in DATA as sp,su,sa,si,ss
+    DATA.forEach(d => {
+      d._origM = { pop: d.sp || 0, u20: d.su || 0, a39: d.sa || 0, inc: d.si || 0, saf: d.ss || 0, stn: d.tr };
+    });
+
+    initZoneTabs();
+    updateMetrics();
+    updateLegend();
+    setTimeout(drawMap, 50);
+    renderRanking();
+    updateHistogram();
+  </script>
+</body>
+
+</html>
