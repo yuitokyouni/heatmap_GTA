@@ -346,7 +346,12 @@
                         const resp = await fetch(`cache/xkt013/${name}.json`);
                         if (!resp.ok) return null;
                         const data = await resp.json();
-                        if (data?.type === 'FeatureCollection') return data.features;
+                        if (data?.type === 'FeatureCollection') return data.features.map(f => {
+                            const p = f.properties, yr = ['2025', '2030', '2035', '2040', '2045', '2050'], slim = {};
+                            yr.forEach(y => { ['PT01', 'PT02', 'PT23', 'PT24', 'PT25'].forEach(k => { const v = p[k + '_' + y]; if (v != null) slim[k + '_' + y] = v }) });
+                            if (p.PT01_2020 != null) slim.PT01_2020 = p.PT01_2020; if (p.PT02_2020 != null) slim.PT02_2020 = p.PT02_2020;
+                            return { type: 'Feature', geometry: f.geometry, properties: slim };
+                        });
                         return null;
                     } catch (e) { return null; }
                 });
