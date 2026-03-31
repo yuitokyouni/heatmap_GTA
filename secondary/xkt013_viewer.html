@@ -181,12 +181,12 @@
     <div class="app">
         <div class="sidebar">
             <h1>将来推計<span>人口</span></h1>
-            <div class="sub">250mメッシュ × 年齢構成 (2020→2070)</div>
+            <div class="sub">250mメッシュ × 年齢構成 (2025→2070)</div>
 
             <div class="control">
                 <label>表示指標</label>
                 <select id="metric-select">
-                    <option value="total">総人口変化率 (2020→選択年)</option>
+                    <option value="total">総人口変化率 (2025→選択年)</option>
                     <option value="young">若年層比率 (0-39歳)</option>
                     <option value="elderly">高齢化率 (65歳以上)</option>
                     <option value="working">生産年齢比率 (15-64歳)</option>
@@ -389,7 +389,7 @@
 
             // Total population for the year
             const popTotal = findVal(`PT02_${year}`) || findVal(`PT01_${year}`);
-            const pop2020 = findVal('PT02_2020') || findVal('PT01_2020') || findVal('T001082');
+            const pop2025 = findVal('PT02_2025') || findVal('PT01_2025');
 
             // Age groups
             const pop0_14 = findVal(`PT23_${year}`);
@@ -407,7 +407,7 @@
             switch (metric) {
                 case 'total':
                     // Population change ratio vs 2020
-                    if (popTotal != null && pop2020 != null && pop2020 > 0) {
+                    if (popTotal != null && pop2025 != null && pop2025 > 0) {
                         const pop2025 = findVal('PT02_2025') || findVal('PT01_2025');
                         if (popTotal != null && pop2025 != null && pop2025 > 0) return ((popTotal / pop2025) - 1) * 100;
                         return null;
