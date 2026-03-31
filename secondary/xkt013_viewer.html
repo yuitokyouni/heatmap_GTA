@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>ASTRO — 将来推計人口ビューア</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: #f4f6fa;
+            color: #1A3260
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: 100vh
+        }
+
+        .sidebar {
+            background: #fff;
+            border-right: 1px solid rgba(26, 50, 96, .08);
+            padding: 20px;
+            overflow-y: auto
+        }
+
+        .sidebar h1 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+
+        .sidebar h1 span {
+            color: #4590B8
+        }
+
+        .sidebar .sub {
+            font-size: 11px;
+            color: #8596ad;
+            margin-bottom: 16px
+        }
+
+        .control {
+            margin-bottom: 16px
+        }
+
+        .control label {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            color: #8596ad;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px
+        }
+
+        .control select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid rgba(26, 50, 96, .1);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            color: #1A3260;
+            background: #f4f6fa;
+            cursor: pointer
+        }
+
+        .zone-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            margin: 3px 0;
+            border: 1px solid rgba(26, 50, 96, .08);
+            border-radius: 8px;
+            background: #f4f6fa;
+            color: #3d5a80;
+            font-size: 11.5px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: .12s
+        }
+
+        .zone-btn:hover {
+            border-color: #4590B8;
+            color: #1A3260
+        }
+
+        .zone-btn.on {
+            background: #1A3260;
+            color: #fff;
+            border-color: #1A3260
+        }
+
+        .legend {
+            margin-top: 20px;
+            padding: 14px;
+            background: #f4f6fa;
+            border-radius: 8px
+        }
+
+        .legend h3 {
+            font-size: 10px;
+            font-weight: 600;
+            color: #8596ad;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 8px
+        }
+
+        .legend-bar {
+            display: flex;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 4px
+        }
+
+        .legend-bar span {
+            flex: 1
+        }
+
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #8596ad
+        }
+
+        .stats {
+            margin-top: 16px;
+            padding: 14px;
+            background: #f4f6fa;
+            border-radius: 8px
+        }
+
+        .stats h3 {
+            font-size: 10px;
+            font-weight: 600;
+            color: #8596ad;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 8px
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 11px
+        }
+
+        .stat-label {
+            color: #8596ad
+        }
+
+        .stat-val {
+            font-weight: 600
+        }
+
+        #map {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="sidebar">
+            <h1>将来推計<span>人口</span></h1>
+            <div class="sub">250mメッシュ × 年齢構成 (2020→2070)</div>
+
+            <div class="control">
+                <label>表示指標</label>
+                <select id="metric-select">
+                    <option value="total">総人口変化率 (2020→選択年)</option>
+                    <option value="young">若年層比率 (0-39歳)</option>
+                    <option value="elderly">高齢化率 (65歳以上)</option>
+                    <option value="working">生産年齢比率 (15-64歳)</option>
+                    <option value="child">年少人口比率 (0-14歳)</option>
+                </select>
+            </div>
+
+            <div class="control">
+                <label>推計年</label>
+                <select id="year-select">
+                    <option value="2025">2025</option>
+                    <option value="2030">2030</option>
+                    <option value="2035" selected>2035</option>
+                    <option value="2040">2040</option>
+                    <option value="2045">2045</option>
+                    <option value="2050">2050</option>
+                    <option value="2055">2055</option>
+                    <option value="2060">2060</option>
+                    <option value="2065">2065</option>
+                    <option value="2070">2070</option>
+                </select>
+            </div>
+
+            <div class="control">
+                <label>ゾーン選択</label>
+                <div id="zone-btns"></div>
+            </div>
+
+            <div class="legend" id="legend">
+                <h3 id="legend-title">総人口変化率</h3>
+                <div class="legend-bar" id="legend-bar"></div>
+                <div class="legend-labels"><span id="leg-lo">-50%</span><span>0%</span><span id="leg-hi">+50%</span>
+                </div>
+            </div>
+
+            <div class="stats" id="stats" style="display:none">
+                <h3 id="stats-title">—</h3>
+                <div id="stats-body"></div>
+            </div>
+        </div>
+
+        <div style="position:relative">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // XKT013 Field mapping (from 製品仕様書)
+        // ============================================================
+        // PT{NN}_{YYYY} where NN = field code, YYYY = year
+        // Key fields:
+        //   PT01 = 総人口(秘匿なし)  PT02 = 総人口  
+        //   PT03 = 0-4歳  PT04 = 5-9  PT05 = 10-14  PT06 = 15-19  PT07 = 20-24
+        //   PT08 = 25-29  PT09 = 30-34  PT10 = 35-39  PT11 = 40-44  PT12 = 45-49
+        //   PT13 = 50-54  PT14 = 55-59  PT15 = 60-64  PT16 = 65-69  PT17 = 70-74
+        //   PT18 = 75-79  PT19 = 80-84  PT20 = 85-89  PT21 = 90-94  PT22 = 95+
+        //   PT23 = 0-14歳  PT24 = 15-64歳  PT25 = 65歳以上  PT26 = 75歳以上
+        //
+        // Note: actual API field names use format like "PT02_2035" for total pop 2035
+        // But looking at test data: PT16_2060=64.3997, PT12_2035=92.5027
+        // These seem to be INDEX values (base 2020 = 100), not absolute counts
+        // Let me handle both formats
+
+        // Zones data
+        const ZONES = {
+            zone_23ku: { name: '東京23区', center: [139.74, 35.70], zoom: 11 },
+            zone_yokakawa: { name: '横浜川崎', center: [139.58, 35.50], zoom: 11 },
+            zone_tama: { name: '東京多摩', center: [139.47, 35.69], zoom: 11 },
+            zone_saitama: { name: 'さいたま圏', center: [139.63, 35.89], zoom: 10.5 },
+            zone_chiba_nw: { name: '千葉北西・TX', center: [140.01, 35.79], zoom: 10 },
+            zone_chiba_e: { name: '千葉・千葉市圏', center: [140.12, 35.63], zoom: 11 },
+            zone_kanagawa: { name: '神奈川その他', center: [139.42, 35.36], zoom: 11 },
+        };
+
+        let activeZone = null;
+        let currentData = null;
+
+        // ============================================================
+        // Map
+        // ============================================================
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: {
+                version: 8,
+                sources: {
+                    'gsi': {
+                        type: 'raster',
+                        tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'],
+                        tileSize: 256,
+                        attribution: '国土地理院'
+                    }
+                },
+                layers: [{ id: 'gsi', type: 'raster', source: 'gsi' }]
+            },
+            center: [139.7, 35.7],
+            zoom: 9
+        });
+
+        map.addControl(new maplibregl.NavigationControl(), 'top-left');
+
+        // ============================================================
+        // Zone buttons
+        // ============================================================
+        const zoneBtns = document.getElementById('zone-btns');
+        Object.entries(ZONES).forEach(([zid, z]) => {
+            const btn = document.createElement('button');
+            btn.className = 'zone-btn';
+            btn.textContent = z.name;
+            btn.onclick = () => loadZone(zid);
+            zoneBtns.appendChild(btn);
+        });
+
+        async function loadZone(zid) {
+            activeZone = zid;
+            document.querySelectorAll('.zone-btn').forEach((b, i) => {
+                b.classList.toggle('on', Object.keys(ZONES)[i] === zid);
+            });
+
+            const z = ZONES[zid];
+            map.flyTo({ center: z.center, zoom: z.zoom, duration: 600 });
+
+            // Load cached data
+            const path = `cache/xkt013/${zid}.json`;
+            try {
+                const resp = await fetch(path);
+                if (!resp.ok) throw new Error('Not found');
+                currentData = await resp.json();
+                console.log(`Loaded ${zid}: ${currentData.features?.length} features`);
+                renderLayer();
+            } catch (e) {
+                console.error(`Failed to load ${path}:`, e);
+                alert(`Cache file not found: ${path}\nRun: python fetch_reinfolib.py --apikey KEY --layer xkt013 --zone ${zid}`);
+            }
+        }
+
+        // ============================================================
+        // Metric computation
+        // ============================================================
+        function computeValue(props, metric, year) {
+            // Try to find the right field names
+            // Format varies: "PT02_2035" or "PT02_2035_ja" etc.
+            const keys = Object.keys(props);
+
+            // Helper to find value by pattern
+            function findVal(pattern) {
+                const key = keys.find(k => k.includes(pattern));
+                return key ? parseFloat(props[key]) : null;
+            }
+
+            // Total population for the year
+            const popTotal = findVal(`PT02_${year}`) || findVal(`PT01_${year}`);
+            const pop2020 = findVal('PT02_2020') || findVal('PT01_2020') || findVal('T001082');
+
+            // Age groups
+            const pop0_14 = findVal(`PT23_${year}`);
+            const pop15_64 = findVal(`PT24_${year}`);
+            const pop65plus = findVal(`PT25_${year}`);
+
+            // Young (0-39): sum PT03 through PT10
+            let popYoung = 0;
+            let hasYoung = false;
+            for (let i = 3; i <= 10; i++) {
+                const v = findVal(`PT${String(i).padStart(2, '0')}_${year}`);
+                if (v != null) { popYoung += v; hasYoung = true; }
+            }
+
+            switch (metric) {
+                case 'total':
+                    // Population change ratio vs 2020
+                    if (popTotal != null && pop2020 != null && pop2020 > 0) {
+                        return ((popTotal / pop2020) - 1) * 100; // percentage change
+                    }
+                    // If values are already index (base=100), adjust
+                    if (popTotal != null && popTotal < 500) {
+                        return popTotal - 100; // already an index
+                    }
+                    return null;
+
+                case 'young':
+                    // 0-39 as % of total
+                    if (hasYoung && popTotal > 0) return (popYoung / popTotal) * 100;
+                    if (pop0_14 != null && popTotal > 0) return (pop0_14 / popTotal) * 100;
+                    return null;
+
+                case 'elderly':
+                    if (pop65plus != null && popTotal > 0) return (pop65plus / popTotal) * 100;
+                    return null;
+
+                case 'working':
+                    if (pop15_64 != null && popTotal > 0) return (pop15_64 / popTotal) * 100;
+                    return null;
+
+                case 'child':
+                    if (pop0_14 != null && popTotal > 0) return (pop0_14 / popTotal) * 100;
+                    return null;
+            }
+            return null;
+        }
+
+        // ============================================================
+        // Color scales
+        // ============================================================
+        const COLOR_SCALES = {
+            total: { // population change: red (decline) → white → blue (growth)
+                min: -50, max: 50, unit: '%',
+                color: (v) => {
+                    const t = Math.max(0, Math.min(1, (v + 50) / 100));
+                    if (t < 0.5) {
+                        const s = t * 2;
+                        return `rgba(${200 - s * 100},${50 + s * 150},${50 + s * 150},0.6)`;
+                    } else {
+                        const s = (t - 0.5) * 2;
+                        return `rgba(${100 - s * 60},${200 - s * 60},${100 + s * 155},0.6)`;
+                    }
+                }
+            },
+            young: { // 0-39 ratio: low=red → high=green
+                min: 10, max: 50, unit: '%',
+                color: (v) => {
+                    const t = Math.max(0, Math.min(1, (v - 10) / 40));
+                    return `rgba(${200 - t * 150},${80 + t * 120},${60},0.6)`;
+                }
+            },
+            elderly: { // 65+ ratio: low=green → high=red (inverted)
+                min: 10, max: 60, unit: '%',
+                color: (v) => {
+                    const t = Math.max(0, Math.min(1, (v - 10) / 50));
+                    return `rgba(${80 + t * 150},${180 - t * 130},${60},0.6)`;
+                }
+            },
+            working: { // 15-64 ratio
+                min: 30, max: 70, unit: '%',
+                color: (v) => {
+                    const t = Math.max(0, Math.min(1, (v - 30) / 40));
+                    return `rgba(${40 + t * 30},${80 + t * 100},${150 + t * 50},0.6)`;
+                }
+            },
+            child: { // 0-14 ratio
+                min: 0, max: 20, unit: '%',
+                color: (v) => {
+                    const t = Math.max(0, Math.min(1, v / 20));
+                    return `rgba(${200 - t * 140},${100 + t * 80},${60 + t * 140},0.6)`;
+                }
+            }
+        };
+
+        // ============================================================
+        // Render layer
+        // ============================================================
+        function renderLayer() {
+            if (!currentData) return;
+
+            const metric = document.getElementById('metric-select').value;
+            const year = document.getElementById('year-select').value;
+            const scale = COLOR_SCALES[metric];
+
+            // Compute values and assign colors
+            const features = currentData.features.map(f => {
+                const val = computeValue(f.properties, metric, year);
+                return {
+                    ...f,
+                    properties: {
+                        ...f.properties,
+                        _value: val,
+                        _color: val != null ? scale.color(val) : 'rgba(200,200,200,0.2)'
+                    }
+                };
+            });
+
+            const colored = { type: 'FeatureCollection', features };
+
+            // Remove existing layer
+            if (map.getLayer('pop-layer')) map.removeLayer('pop-layer');
+            if (map.getLayer('pop-outline')) map.removeLayer('pop-outline');
+            if (map.getSource('pop-src')) map.removeSource('pop-src');
+
+            map.addSource('pop-src', { type: 'geojson', data: colored });
+
+            // Use data-driven styling
+            const colorStops = [];
+            for (let i = 0; i <= 10; i++) {
+                const v = scale.min + (scale.max - scale.min) * i / 10;
+                colorStops.push(v, scale.color(v));
+            }
+
+            map.addLayer({
+                id: 'pop-layer',
+                type: 'fill',
+                source: 'pop-src',
+                paint: {
+                    'fill-color': ['case',
+                        ['!=', ['get', '_value'], null],
+                        ['get', '_color'],
+                        'rgba(200,200,200,0.1)'
+                    ],
+                    'fill-opacity': 0.7
+                }
+            });
+
+            map.addLayer({
+                id: 'pop-outline',
+                type: 'line',
+                source: 'pop-src',
+                paint: {
+                    'line-color': 'rgba(26,50,96,0.1)',
+                    'line-width': 0.3
+                }
+            });
+
+            // Update legend
+            updateLegend(metric, scale);
+            updateStats(features, metric, scale);
+
+            // Popup
+            map.off('click', 'pop-layer', handlePopupClick);
+            map.on('click', 'pop-layer', handlePopupClick);
+        }
+
+        function handlePopupClick(e) {
+            const props = e.features[0].properties;
+            const metric = document.getElementById('metric-select').value;
+            const year = document.getElementById('year-select').value;
+            const val = props._value;
+            const scale = COLOR_SCALES[metric];
+
+            // Build popup with key demographic data
+            const year_s = year;
+            let html = `<div style="font-family:'DM Sans',sans-serif;font-size:11px;color:#1A3260;min-width:180px">`;
+            html += `<div style="font-weight:700;font-size:13px;margin-bottom:6px">${val != null ? val.toFixed(1) + scale.unit : 'N/A'}</div>`;
+
+            // Show available population data
+            const keys = Object.keys(props).filter(k => k.startsWith('PT') && k.includes(year_s)).sort();
+            keys.slice(0, 10).forEach(k => {
+                const v = parseFloat(props[k]);
+                if (!isNaN(v)) {
+                    const label = k.replace(`_${year_s}`, '').replace('_ja', '');
+                    html += `<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:#8596ad">${label}</span><span style="font-weight:500">${v.toFixed(1)}</span></div>`;
+                }
+            });
+            html += `</div>`;
+
+            new maplibregl.Popup({ maxWidth: '280px' })
+                .setLngLat(e.lngLat)
+                .setHTML(html)
+                .addTo(map);
+        }
+
+        function updateLegend(metric, scale) {
+            document.getElementById('legend-title').textContent = document.getElementById('metric-select').selectedOptions[0].text;
+            const bar = document.getElementById('legend-bar');
+            bar.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const v = scale.min + (scale.max - scale.min) * (i + 0.5) / 10;
+                const span = document.createElement('span');
+                span.style.background = scale.color(v);
+                bar.appendChild(span);
+            }
+            document.getElementById('leg-lo').textContent = scale.min + scale.unit;
+            document.getElementById('leg-hi').textContent = '+' + scale.max + scale.unit;
+        }
+
+        function updateStats(features, metric, scale) {
+            const vals = features.map(f => f.properties._value).filter(v => v != null);
+            if (vals.length === 0) { document.getElementById('stats').style.display = 'none'; return; }
+
+            document.getElementById('stats').style.display = 'block';
+            document.getElementById('stats-title').textContent = ZONES[activeZone]?.name + ' 統計';
+
+            const avg = vals.reduce((s, v) => s + v, 0) / vals.length;
+            const sorted = [...vals].sort((a, b) => a - b);
+            const median = sorted[Math.floor(sorted.length / 2)];
+            const min = sorted[0];
+            const max = sorted[sorted.length - 1];
+
+            document.getElementById('stats-body').innerHTML = `
+    <div class="stat-row"><span class="stat-label">メッシュ数</span><span class="stat-val">${vals.length}</span></div>
+    <div class="stat-row"><span class="stat-label">平均</span><span class="stat-val">${avg.toFixed(1)}${scale.unit}</span></div>
+    <div class="stat-row"><span class="stat-label">中央値</span><span class="stat-val">${median.toFixed(1)}${scale.unit}</span></div>
+    <div class="stat-row"><span class="stat-label">最小</span><span class="stat-val">${min.toFixed(1)}${scale.unit}</span></div>
+    <div class="stat-row"><span class="stat-label">最大</span><span class="stat-val">${max.toFixed(1)}${scale.unit}</span></div>
+  `;
+        }
+
+        // ============================================================
+        // Event listeners
+        // ============================================================
+        document.getElementById('metric-select').addEventListener('change', renderLayer);
+        document.getElementById('year-select').addEventListener('change', renderLayer);
+    </script>
+</body>
+
+</html>
