@@ -370,6 +370,58 @@
             width: 100%;
             height: 100%
         }
+
+        /* Property markers */
+        .prop-marker {
+            width: 28px;
+            height: 38px;
+            cursor: pointer;
+            position: relative
+        }
+
+        .prop-marker svg {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .3))
+        }
+
+        .prop-popup-card {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            color: #1A3260;
+            min-width: 220px
+        }
+
+        .prop-popup-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px
+        }
+
+        .prop-popup-card .pp-sub {
+            font-size: 10px;
+            color: #8596ad;
+            margin-bottom: 8px
+        }
+
+        .prop-popup-card .pp-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(26, 50, 96, .06)
+        }
+
+        .prop-popup-card .pp-label {
+            color: #8596ad
+        }
+
+        .prop-popup-card .pp-val {
+            font-weight: 600
+        }
+
+        .prop-popup-card .pp-irr {
+            font-size: 16px;
+            font-weight: 700;
+            color: #3a8a5c
+        }
     </style>
 </head>
 
@@ -2104,7 +2156,18 @@
         // ============================================================
         let activeZone = null;
         let activeMuni = null;
-        let layerData = {};  // {layer_code: GeoJSON FeatureCollection}
+        let layerData = {};
+
+        // ASTRO 1 Portfolio — Dummy data (replace with actual)
+        const PROPERTIES = [
+            { id: 'A1-001', name: 'ASTRO Residence 品川', lat: 35.6288, lon: 139.739, ward: '品川区', station: '品川', walk_min: 5, units: 32, gfa_sqm: 1200, year_built: 2019, structure: 'RC', rent_avg_k: 105, occupancy_pct: 97, cap_rate_pct: 4.1, irr_pct: 8.2, acq_price_m: 480, status: 'held' },
+            { id: 'A1-002', name: 'ASTRO Court 中目黒', lat: 35.6439, lon: 139.6986, ward: '目黒区', station: '中目黒', walk_min: 7, units: 18, gfa_sqm: 650, year_built: 2017, structure: 'RC', rent_avg_k: 115, occupancy_pct: 98, cap_rate_pct: 3.8, irr_pct: 7.9, acq_price_m: 350, status: 'held' },
+            { id: 'A1-003', name: 'ASTRO Heights 武蔵小杉', lat: 35.5767, lon: 139.6596, ward: '中原区', station: '武蔵小杉', walk_min: 4, units: 45, gfa_sqm: 1800, year_built: 2021, structure: 'RC', rent_avg_k: 98, occupancy_pct: 99, cap_rate_pct: 4.3, irr_pct: 9.1, acq_price_m: 620, status: 'held' },
+            { id: 'A1-004', name: 'ASTRO Flat 流山おおたかの森', lat: 35.8578, lon: 139.9274, ward: '流山市', station: '流山おおたかの森', walk_min: 6, units: 24, gfa_sqm: 900, year_built: 2020, structure: 'RC', rent_avg_k: 82, occupancy_pct: 96, cap_rate_pct: 4.8, irr_pct: 9.5, acq_price_m: 280, status: 'held' },
+            { id: 'A1-005', name: 'ASTRO Place 大宮', lat: 35.9064, lon: 139.6241, ward: '大宮区', station: '大宮', walk_min: 8, units: 28, gfa_sqm: 1050, year_built: 2018, structure: 'SRC', rent_avg_k: 78, occupancy_pct: 95, cap_rate_pct: 5.0, irr_pct: 8.8, acq_price_m: 310, status: 'held' },
+            { id: 'A1-006', name: 'ASTRO Terrace 藤沢', lat: 35.3389, lon: 139.4873, ward: '藤沢市', station: '藤沢', walk_min: 10, units: 20, gfa_sqm: 750, year_built: 2016, structure: 'RC', rent_avg_k: 72, occupancy_pct: 94, cap_rate_pct: 5.2, irr_pct: 8.0, acq_price_m: 210, status: 'held' },
+        ];
+        let propertyMarkers = [];  // {layer_code: GeoJSON FeatureCollection}
 
         // ============================================================
         // Map init
@@ -2262,22 +2325,67 @@
         async function tryLoadCachedLayers() {
             if (!activeZone) return;
 
-            const layers = ['xkt003', 'xkt013', 'xkt015', 'xkt006', 'xkt008', 'xkt009'];
-            for (const code of layers) {
+            // Non-tile layers: try zone-level merged files
+            const simpleLayers = ['xkt003', 'xkt015', 'xkt006', 'xkt008', 'xkt009'];
+            for (const code of simpleLayers) {
                 const badge = document.getElementById('badge-' + code);
                 const path = `secondary/cache/${code}/${activeZone}.json`;
-
                 try {
                     const resp = await fetch(path);
                     if (!resp.ok) throw new Error('not found');
                     const data = await resp.json();
                     layerData[code] = data;
                     if (badge) { badge.textContent = 'ready'; badge.className = 'layer-badge ready' }
-                    console.log(`Loaded ${code}: ${data.features?.length || 0} features`);
                 } catch (e) {
                     layerData[code] = null;
                     if (badge) { badge.textContent = 'pending'; badge.className = 'layer-badge pending' }
                 }
+            }
+
+            // XKT013: tile-based loading
+            await loadXKT013Tiles();
+        }
+
+        async function loadXKT013Tiles() {
+            const badge = document.getElementById('badge-xkt013');
+            try {
+                const idxResp = await fetch('secondary/cache/xkt013/tile_index.json');
+                if (!idxResp.ok) throw new Error('no index');
+                const tileIndex = await idxResp.json();
+                const tileNames = tileIndex[activeZone];
+                if (!tileNames || tileNames.length === 0) throw new Error('no tiles for zone');
+
+                if (badge) { badge.textContent = 'loading...'; badge.className = 'layer-badge pending' }
+                const allFeatures = [];
+                const batchSize = 20;
+                for (let i = 0; i < tileNames.length; i += batchSize) {
+                    const batch = tileNames.slice(i, i + batchSize);
+                    const results = await Promise.all(batch.map(async name => {
+                        try {
+                            const r = await fetch(`secondary/cache/xkt013/${name}.json`);
+                            if (!r.ok) return null;
+                            const d = await r.json();
+                            if (d?.type === 'FeatureCollection') return d.features.map(f => {
+                                const p = f.properties, slim = {};
+                                ['2020', '2025', '2030', '2035', '2040', '2045', '2050'].forEach(y => {
+                                    ['PT01', 'PT02', 'PT23', 'PT24', 'PT25'].forEach(k => {
+                                        const v = p[k + '_' + y]; if (v != null) slim[k + '_' + y] = v;
+                                    });
+                                });
+                                return { type: 'Feature', geometry: f.geometry, properties: slim };
+                            });
+                            return null;
+                        } catch (e) { return null }
+                    }));
+                    results.forEach(feats => { if (feats) allFeatures.push(...feats) });
+                }
+
+                layerData.xkt013 = { type: 'FeatureCollection', features: allFeatures };
+                if (badge) { badge.textContent = `ready (${allFeatures.length})`; badge.className = 'layer-badge ready' }
+                console.log(`XKT013: ${allFeatures.length} features loaded`);
+            } catch (e) {
+                layerData.xkt013 = null;
+                if (badge) { badge.textContent = 'pending'; badge.className = 'layer-badge pending' }
             }
         }
 
@@ -2297,7 +2405,11 @@
                     'fill-outline-color': 'rgba(26,50,96,0.3)'
                 }
             },
-            xkt013: { name: '将来推計人口', paint: { 'fill-color': 'rgba(69,144,184,0.3)', 'fill-outline-color': 'rgba(26,50,96,0.15)' } },
+            xkt013: {
+                name: '将来推計人口 (2025→2035)',
+                customRender: true,
+                paint: { 'fill-color': 'rgba(69,144,184,0.3)', 'fill-outline-color': 'rgba(26,50,96,0.1)' }
+            },
             xkt015: { name: '駅別乗降客数', paint: { 'circle-color': 'var(--navy)', 'circle-radius': 5 } },
             xkt006: { name: '学校', paint: { 'circle-color': '#3a8a5c', 'circle-radius': 4 } },
             xkt008: { name: '医療機関', paint: { 'circle-color': '#c44e3f', 'circle-radius': 3 } },
@@ -2325,7 +2437,25 @@
             if (map.getLayer(layerId)) map.removeLayer(layerId);
             if (map.getSource(sourceId)) map.removeSource(sourceId);
 
-            // Add source
+            // Add source — for XKT013, compute colors first
+            if (code === 'xkt013' && data.features) {
+                data = {
+                    type: 'FeatureCollection', features: data.features.map(f => {
+                        const p = f.properties;
+                        const pop2025 = p.PT02_2025 || p.PT01_2025;
+                        const pop2035 = p.PT02_2035 || p.PT01_2035;
+                        let change = null;
+                        if (pop2025 > 0 && pop2035 != null) change = ((pop2035 / pop2025) - 1) * 100;
+                        let color = 'rgba(200,200,200,0.1)';
+                        if (change != null) {
+                            const t = Math.max(0, Math.min(1, (change + 50) / 100));
+                            if (t < 0.5) { const s = t * 2; color = `rgba(${180 + s * 20},${40 + s * 180},${40 + s * 180},0.65)` }
+                            else { const s = (t - 0.5) * 2; color = `rgba(${220 - s * 180},${220},${220 - s * 180},0.65)` }
+                        }
+                        return { ...f, properties: { ...p, _color: color, _change: change } };
+                    })
+                };
+            }
             map.addSource(sourceId, { type: 'geojson', data: data });
 
             // Determine geometry type from first feature
@@ -2354,13 +2484,23 @@
                 });
             } else {
                 // Polygon
-                map.addLayer({
-                    id: layerId, type: 'fill', source: sourceId,
-                    paint: style.paint || {
-                        'fill-color': 'rgba(69,144,184,0.3)',
-                        'fill-outline-color': 'rgba(26,50,96,0.3)'
-                    }
-                });
+                if (code === 'xkt013') {
+                    map.addLayer({
+                        id: layerId, type: 'fill', source: sourceId,
+                        paint: {
+                            'fill-color': ['coalesce', ['get', '_color'], 'rgba(200,200,200,0.1)'],
+                            'fill-outline-color': 'rgba(26,50,96,0.08)'
+                        }
+                    });
+                } else {
+                    map.addLayer({
+                        id: layerId, type: 'fill', source: sourceId,
+                        paint: style.paint || {
+                            'fill-color': 'rgba(69,144,184,0.3)',
+                            'fill-outline-color': 'rgba(26,50,96,0.3)'
+                        }
+                    });
+                }
             }
 
             // Show legend for XKT003
@@ -2404,7 +2544,44 @@
         map.on('load', () => {
             initZoneChips();
             renderMuniList();
+            renderPropertyPins();
         });
+
+        function renderPropertyPins() {
+            // Remove existing
+            propertyMarkers.forEach(m => m.remove());
+            propertyMarkers = [];
+
+            PROPERTIES.forEach(p => {
+                // Create pin element
+                const el = document.createElement('div');
+                el.className = 'prop-marker';
+                el.innerHTML = `<svg width="28" height="38" viewBox="0 0 28 38">
+      <path d="M14 0C6.3 0 0 6.3 0 14c0 5.2 3 9.7 7 12.6L14 38l7-11.4c4-2.9 7-7.4 7-12.6C28 6.3 21.7 0 14 0z" fill="#1A3260"/>
+      <circle cx="14" cy="13" r="5" fill="#fff"/>
+      <text x="14" y="15" text-anchor="middle" fill="#1A3260" font-size="7" font-weight="700">A</text>
+    </svg>`;
+
+                const marker = new maplibregl.Marker({ element: el })
+                    .setLngLat([p.lon, p.lat])
+                    .setPopup(new maplibregl.Popup({ maxWidth: '300px', offset: 20 }).setHTML(
+                        `<div class="prop-popup-card">
+          <h4>${p.name}</h4>
+          <div class="pp-sub">${p.ward} · ${p.station}駅 徒歩${p.walk_min}分 · ${p.year_built}年 ${p.structure}</div>
+          <div class="pp-row"><span class="pp-label">IRR</span><span class="pp-irr">${p.irr_pct}%</span></div>
+          <div class="pp-row"><span class="pp-label">Cap Rate</span><span class="pp-val">${p.cap_rate_pct}%</span></div>
+          <div class="pp-row"><span class="pp-label">取得価格</span><span class="pp-val">¥${p.acq_price_m}M</span></div>
+          <div class="pp-row"><span class="pp-label">戸数</span><span class="pp-val">${p.units}戸</span></div>
+          <div class="pp-row"><span class="pp-label">延床面積</span><span class="pp-val">${p.gfa_sqm}㎡</span></div>
+          <div class="pp-row"><span class="pp-label">平均賃料</span><span class="pp-val">¥${p.rent_avg_k}K/月</span></div>
+          <div class="pp-row"><span class="pp-label">稼働率</span><span class="pp-val">${p.occupancy_pct}%</span></div>
+        </div>`
+                    ))
+                    .addTo(map);
+
+                propertyMarkers.push(marker);
+            });
+        }
     </script>
 </body>
 
