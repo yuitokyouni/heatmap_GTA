@@ -2453,7 +2453,7 @@
                             if (t < 0.5) { const s = t * 2; color = `rgba(${180 + s * 20},${40 + s * 180},${40 + s * 180},0.65)` }
                             else { const s = (t - 0.5) * 2; color = `rgba(${220 - s * 180},${220},${220 - s * 180},0.65)` }
                         }
-                        return { ...f, properties: { ...p, _color: color, _change: change } };
+                        return { ...f, properties: { ...p, _change: change != null ? change : -999 } };
                     })
                 };
             }
@@ -2514,14 +2514,21 @@
                     map.addLayer({
                         id: layerId, type: 'fill', source: sourceId,
                         paint: {
-                            'fill-color': ['case', ['==', ['get', '_change'], null], 'rgba(0,0,0,0)',
-                                ['interpolate', ['linear'], ['get', '_change'],
-                                    -50, 'rgb(255,255,255)', 0, 'rgb(255,255,255)',
-                                    5, 'rgb(180,230,160)', 20, 'rgb(80,200,80)', 50, 'rgb(20,140,20)']],
-                            'fill-outline-color': ['case', ['==', ['get', '_change'], null], 'rgba(0,0,0,0)', ['>', ['get', '_change'], 0], 'rgba(26,50,96,0.1)', 'rgba(0,0,0,0)'],
-                            'fill-opacity': ['case', ['==', ['get', '_change'], null], 0,
-                                ['interpolate', ['linear'], ['get', '_change'],
-                                    -50, 0, 0, 0, 1, 0.5, 20, 0.7, 50, 0.85]]
+                            'fill-color': ['step', ['get', '_change'],
+                                'rgba(0,0,0,0)', -998,
+                                'rgba(255,255,255,0)', 0,
+                                'rgb(180,230,160)', 5,
+                                'rgb(80,200,80)', 20,
+                                'rgb(20,140,20)'],
+                            'fill-outline-color': ['step', ['get', '_change'],
+                                'rgba(0,0,0,0)', 0,
+                                'rgba(26,50,96,0.1)'],
+                            'fill-opacity': ['step', ['get', '_change'],
+                                0, -998,
+                                0, 0,
+                                0.5, 5,
+                                0.7, 20,
+                                0.85]
                         }
                     });
                 } else {
