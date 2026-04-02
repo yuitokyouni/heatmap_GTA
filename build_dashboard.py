@@ -24,6 +24,8 @@ import math
 import os
 import sys
 from pathlib import Path
+from datetime import datetime
+import hashlib
 
 SCRIPT_DIR = Path(__file__).parent
 
@@ -258,7 +260,7 @@ def compute_all_scores(pop_data, age_data, income_data, crime_data, station_data
                        existing_detail, dynamic_thresholds=False):
     """
     Main scoring function.
-    Returns list of score dicts, one per municipality.
+    Returns (results, thresholds).
     """
     # Collect all codes
     all_codes = sorted(set(
@@ -350,7 +352,7 @@ def compute_all_scores(pop_data, age_data, income_data, crime_data, station_data
             "total_score": round(total, 1),
         })
 
-    return results
+    return results, thresholds
 
 
 # ============================================================
@@ -463,13 +465,52 @@ def build_dashboard_data(results: list) -> str:
     return json.dumps(compact, ensure_ascii=False, separators=(",", ":"))
 
 
+def short_file_hash(path: str) -> str:
+    h = hashlib.sha1()
+    with open(path, "rb") as f:
+        while True:
+            chunk = f.read(8192)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()[:10]
+
+
+def build_methodology_meta(args, results, thresholds) -> str:
+    files = {
+        "population": os.path.join(args.data_dir, "raw_population_10y.csv"),
+        "age": os.path.join(args.data_dir, "raw_under20_2039.csv"),
+        "income": os.path.join(args.data_dir, "raw_taxable_income.csv"),
+        "crime": os.path.join(args.data_dir, "raw_crime.csv"),
+        "station": os.path.join(args.data_dir, "raw_station.csv"),
+    }
+
+    versions = {}
+    for key, path in files.items():
+        if os.path.exists(path):
+            versions[key] = short_file_hash(path)
+
+    payload = {
+        "build_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "source_file_version": versions,
+        "municipality_count": sum(1 for r in results if r.get("city_jp")),
+        "score_thresholds_used": thresholds,
+        "selected_methodology_label": (
+            "Dynamic percentile thresholds"
+            if args.dynamic_thresholds else
+            "Fixed thresholds from original Excel model"
+        ),
+    }
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+
+
 # ============================================================
 # 6. HTML generation
 # ============================================================
 
-def build_html(score_json: str, geo_path: str, station_path: str, template_path: str) -> str:
+def build_html(score_json: str, geo_path: str, station_path: str, template_path: str, meta_json: str) -> str:
     """
-    Read template.html, inject GeoJSON + score data + station data.
+    Read template.html, inject GeoJSON + score data + station data + methodology metadata.
     """
     print("\n  Building index.html...")
 
@@ -505,6 +546,7 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
     html = template.replace("/*__GEO_DATA__*/null", geo_json_merged)
     html = html.replace("/*__SCORE_DATA__*/null", score_json)
     html = html.replace("/*__STATION_DATA__*/null", station_json)
+    html = html.replace("/*__META_DATA__*/null", meta_json)
 
     # Inject zones data if available
     zones_path = SCRIPT_DIR / "secondary" / "zones.json"
@@ -577,7 +619,7 @@ Examples:
 
     # Step 2: Compute scores
     print("\n[Step 2] Computing scores...")
-    results = compute_all_scores(
+    results, thresholds = compute_all_scores(
         pop_data, age_data, income_data, crime_data, station_data,
         existing_detail, dynamic_thresholds=args.dynamic_thresholds
     )
@@ -590,8 +632,12 @@ Examples:
     print("\n[Step 4] Building dashboard data...")
     score_json = build_dashboard_data(results)
 
-    # Step 5: Generate HTML
-    print("\n[Step 5] Generating index.html...")
+    # Step 5: Build methodology metadata
+    print("\n[Step 5] Building methodology metadata...")
+    meta_json = build_methodology_meta(args, results, thresholds)
+
+    # Step 6: Generate HTML
+    print("\n[Step 6] Generating index.html...")
     geo_path = os.path.join(args.geo_dir, "kanto.json")
     station_path = os.path.join(args.geo_dir, "stations.json")
 
@@ -605,7 +651,7 @@ Examples:
         print(f"  [ERROR] Template not found: {args.template}")
         sys.exit(1)
 
-    html = build_html(score_json, geo_path, station_path, args.template)
+    html = build_html(score_json, geo_path, station_path, args.template, meta_json)
 
     with open(args.output, "w", encoding="utf-8") as f:
         f.write(html)
