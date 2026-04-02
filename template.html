@@ -464,6 +464,58 @@
       margin: 0
     }
 
+    .page-tabs {
+      display: flex;
+      gap: 6px;
+      margin: 0 0 12px
+    }
+
+    .page-tabs button {
+      background: #edf1f7;
+      border: 1px solid rgba(26, 50, 96, .1);
+      color: #3d5a80;
+      font-size: 11px;
+      font-family: var(--font);
+      padding: 6px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: .15s;
+      font-weight: 600
+    }
+
+    .page-tabs button.on {
+      background: #1A3260;
+      border-color: #1A3260;
+      color: #fff
+    }
+
+    .tab-panel {
+      display: none
+    }
+
+    .tab-panel.on {
+      display: block
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 10px 16px;
+      font-size: 12px
+    }
+
+    .meta-k {
+      color: var(--tx3);
+      font-weight: 600
+    }
+
+    .meta-v {
+      color: var(--tx);
+      font-family: var(--mono);
+      white-space: pre-wrap;
+      word-break: break-word
+    }
+
     .zone-tabs {
       display: flex;
       gap: 3px;
@@ -500,58 +552,6 @@
       font-size: 9px;
       opacity: .7;
       margin-left: 3px
-    }
-
-    .page-tabs {
-      display: flex;
-      gap: 6px;
-      margin: 0 0 12px;
-    }
-
-    .page-tabs button {
-      background: #edf1f7;
-      border: 1px solid rgba(26, 50, 96, .1);
-      color: #3d5a80;
-      font-size: 11px;
-      font-family: var(--font);
-      padding: 6px 14px;
-      border-radius: 16px;
-      cursor: pointer;
-      transition: .15s;
-      font-weight: 600;
-    }
-
-    .page-tabs button.on {
-      background: #1A3260;
-      border-color: #1A3260;
-      color: #fff;
-    }
-
-    .tab-panel {
-      display: none
-    }
-
-    .tab-panel.on {
-      display: block
-    }
-
-    .meta-grid {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 10px 16px;
-      font-size: 12px;
-    }
-
-    .meta-k {
-      color: var(--tx3);
-      font-weight: 600;
-    }
-
-    .meta-v {
-      color: var(--tx);
-      font-family: var(--mono);
-      white-space: pre-wrap;
-      word-break: break-word;
     }
   </style>
 </head>
@@ -695,7 +695,6 @@
         </div>
       </div>
     </section>
-
     <section class="tab-panel" id="tab-method">
       <div class="card">
         <div class="card-h">
@@ -729,6 +728,38 @@
     const ZONES =/*__ZONES_DATA__*/null;
     let activeZone = 'all';
     let zoneFilter = null; // set of codes to show, or null for all
+
+
+    function initPageTabs() {
+      const tabs = document.querySelectorAll('#page-tabs button');
+      const panels = document.querySelectorAll('.tab-panel');
+      tabs.forEach(btn => {
+        btn.onclick = () => {
+          tabs.forEach(b => b.classList.remove('on'));
+          panels.forEach(p => p.classList.remove('on'));
+          btn.classList.add('on');
+          document.getElementById('tab-' + btn.dataset.tab).classList.add('on');
+        };
+      });
+    }
+
+    function renderMethodology() {
+      if (!META) return;
+      const el = document.getElementById('methodology-panel');
+      if (!el) return;
+      var h = '';
+      h += '<div class="meta-k">Build date</div>';
+      h += '<div class="meta-v">' + (META.build_date || '-') + '</div>';
+      h += '<div class="meta-k">Municipality count</div>';
+      h += '<div class="meta-v">' + (META.municipality_count || '-') + '</div>';
+      h += '<div class="meta-k">Methodology</div>';
+      h += '<div class="meta-v">' + (META.selected_methodology_label || '-') + '</div>';
+      h += '<div class="meta-k">Source file version</div>';
+      h += '<div class="meta-v">' + JSON.stringify(META.source_file_version || {}, null, 2) + '</div>';
+      h += '<div class="meta-k">Score thresholds used</div>';
+      h += '<div class="meta-v">' + JSON.stringify(META.score_thresholds_used || {}, null, 2) + '</div>';
+      el.innerHTML = h;
+    }
 
     function initZoneTabs() {
       if (!ZONES) return;
@@ -803,41 +834,6 @@
         if (b.textContent === 'All') b.classList.add('on');
         else b.classList.remove('on');
       });
-    }
-
-    function initPageTabs() {
-      const tabs = document.querySelectorAll('#page-tabs button');
-      const panels = document.querySelectorAll('.tab-panel');
-      tabs.forEach(btn => {
-        btn.onclick = () => {
-          tabs.forEach(b => b.classList.remove('on'));
-          panels.forEach(p => p.classList.remove('on'));
-          btn.classList.add('on');
-          document.getElementById('tab-' + btn.dataset.tab).classList.add('on');
-        };
-      });
-    }
-
-    function renderMethodology() {
-      if (!META) return;
-      const el = document.getElementById('methodology-panel');
-      if (!el) return;
-      el.innerHTML = `
-        <div class="meta-k">Build date</div>
-        <div class="meta-v">${META.build_date ?? '-'}</div>
-
-        <div class="meta-k">Municipality count</div>
-        <div class="meta-v">${META.municipality_count ?? '-'}</div>
-
-        <div class="meta-k">Methodology</div>
-        <div class="meta-v">${META.selected_methodology_label ?? '-'}</div>
-
-        <div class="meta-k">Source file version</div>
-        <div class="meta-v">${JSON.stringify(META.source_file_version ?? {}, null, 2)}</div>
-
-        <div class="meta-k">Score thresholds used</div>
-        <div class="meta-v">${JSON.stringify(META.score_thresholds_used ?? {}, null, 2)}</div>
-      `;
     }
     let zoom = 1, panX = 0, panY = 0, isPanning = false, panStartX = 0, panStartY = 0;
     let metric = 'to'; // 'to', 'm', 'tr'
@@ -1096,48 +1092,6 @@
         }
 
         // Station hover label
-        if (showProperties && PROPS) {
-          for (const p of PROPS) {
-            const sx = px(p.lon), sy = py(p.lat);
-            if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
-            const isHov = (hoveredProperty === p);
-            // Pin shape
-            ctx.save();
-            ctx.translate(sx, sy);
-            // Drop shadow
-            ctx.beginPath();
-            ctx.arc(0, -12, isHov ? 10 : 7, Math.PI, 2 * Math.PI);
-            ctx.lineTo(0, 0);
-            ctx.closePath();
-            ctx.fillStyle = isHov ? '#1A3260' : '#C44E3F';
-            ctx.fill();
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            // Inner dot
-            ctx.beginPath();
-            ctx.arc(0, -12, 3, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
-            ctx.restore();
-            // Label on hover
-            if (isHov) {
-              const label = p.name;
-              ctx.font = 'bold 11px system-ui';
-              const tw = ctx.measureText(label).width;
-              ctx.fillStyle = 'rgba(26,50,96,.9)';
-              const bx = sx - tw / 2 - 6, by = sy - 35;
-              ctx.beginPath();
-              ctx.roundRect(bx, by, tw + 12, 20, 4);
-              ctx.fill();
-              ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-              ctx.fillText(label, sx, by + 10);
-              ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
-            }
-          }
-        }
-
-        // Station hover label
         if (hoveredStation) {
           const sx = px(hoveredStation.lo), sy = py(hoveredStation.la);
           const tl = ['Terminal', 'Hub', 'JR', 'Private', 'Local'];
@@ -1149,6 +1103,43 @@
           ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
           ctx.fillText(label, sx, sy - 11);
           ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+        }
+      }
+      // Property pins (independent of stations)
+      if (showProperties && PROPS) {
+        for (const p of PROPS) {
+          const sx = px(p.lon), sy = py(p.lat);
+          if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
+          const isHov = (hoveredProperty === p);
+          ctx.save();
+          ctx.translate(sx, sy);
+          ctx.beginPath();
+          ctx.arc(0, -12, isHov ? 10 : 7, Math.PI, 2 * Math.PI);
+          ctx.lineTo(0, 0);
+          ctx.closePath();
+          ctx.fillStyle = isHov ? '#1A3260' : '#C44E3F';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(0, -12, 3, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff';
+          ctx.fill();
+          ctx.restore();
+          if (isHov) {
+            const label = p.name;
+            ctx.font = 'bold 11px system-ui';
+            const tw = ctx.measureText(label).width;
+            ctx.fillStyle = 'rgba(26,50,96,.9)';
+            const bx = sx - tw / 2 - 6, by = sy - 35;
+            ctx.beginPath();
+            ctx.roundRect(bx, by, tw + 12, 20, 4);
+            ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(label, sx, by + 10);
+            ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+          }
         }
       }
     }
