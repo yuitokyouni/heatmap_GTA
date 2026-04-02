@@ -2337,6 +2337,7 @@
                     layerData[code] = data;
                     if (badge) { badge.textContent = 'ready'; badge.className = 'layer-badge ready' }
                 } catch (e) {
+                    console.log('LAYER LOAD FAIL:', code, e.message);
                     layerData[code] = null;
                     if (badge) { badge.textContent = 'pending'; badge.className = 'layer-badge pending' }
                 }
@@ -2427,7 +2428,7 @@
                 return;
             }
 
-            const data = layerData[code];
+            let data = layerData[code];
             if (!data || !data.features || data.features.length === 0) {
                 alert('No data loaded for ' + code + '. Run fetch_reinfolib.py first.');
                 return;
@@ -2488,8 +2489,11 @@
                     map.addLayer({
                         id: layerId, type: 'fill', source: sourceId,
                         paint: {
-                            'fill-color': ['coalesce', ['get', '_color'], 'rgba(200,200,200,0.1)'],
-                            'fill-outline-color': 'rgba(26,50,96,0.08)'
+                            'fill-color': ['interpolate', ['linear'], ['get', '_change'],
+                                -50, 'rgb(200,60,60)', -20, 'rgb(210,140,140)', 0, 'rgb(245,245,230)',
+                                20, 'rgb(140,210,140)', 50, 'rgb(20,160,20)'],
+                            'fill-outline-color': 'rgba(26,50,96,0.08)',
+                            'fill-opacity': 0.65
                         }
                     });
                 } else {
