@@ -417,7 +417,7 @@ def build_dashboard_data(results: list) -> str:
     coord_path = SCRIPT_DIR / "geo" / "coordinates.json"
     coords = {}
     if coord_path.exists():
-        with open(coord_path, encoding="utf-8") as f:
+        with open(coord_path) as f:
             for entry in json.load(f):
                 coords[entry["c"]] = entry
 
@@ -473,13 +473,13 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
     """
     print("\n  Building index.html...")
 
-    with open(template_path, encoding="utf-8") as f:
+    with open(template_path) as f:
         template = f.read()
 
-    with open(geo_path, encoding="utf-8") as f:
+    with open(geo_path) as f:
         geo_json = f.read()
 
-    with open(station_path, encoding="utf-8") as f:
+    with open(station_path) as f:
         station_json = f.read()
 
     # Also need to merge score data INTO the GeoJSON properties
@@ -508,14 +508,14 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
     # Inject zones data if available
     zones_path = SCRIPT_DIR / "secondary" / "zones.json"
     if zones_path.exists():
-        with open(zones_path, encoding="utf-8") as f:
+        with open(zones_path) as f:
             zones_data = f.read()
         html = html.replace("/*__ZONES_DATA__*/null", zones_data)
         print(f"    Zones:    {len(zones_data)/1024:.0f} KB")
     else:
         print(f"    Zones:    (not found, zone tabs disabled)")
 
-    # Inject property pins if available
+    # Inject property data if available
     props_path = SCRIPT_DIR / "data" / "properties.json"
     if props_path.exists():
         with open(props_path, encoding="utf-8") as f:

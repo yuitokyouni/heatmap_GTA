@@ -2329,7 +2329,7 @@
             const simpleLayers = ['xkt003', 'xkt015', 'xkt006', 'xkt008', 'xkt009'];
             for (const code of simpleLayers) {
                 const badge = document.getElementById('badge-' + code);
-                const path = `cache/${code}/${activeZone}.json`;
+                const path = `secondary/cache/${code}/${activeZone}.json`;
                 try {
                     const resp = await fetch(path);
                     if (!resp.ok) throw new Error('not found');
@@ -2349,7 +2349,7 @@
         async function loadXKT013Tiles() {
             const badge = document.getElementById('badge-xkt013');
             try {
-                const idxResp = await fetch('cache/xkt013/tile_index.json');
+                const idxResp = await fetch('secondary/cache/xkt013/tile_index.json');
                 if (!idxResp.ok) throw new Error('no index');
                 const tileIndex = await idxResp.json();
                 const tileNames = tileIndex[activeZone];
@@ -2362,7 +2362,7 @@
                     const batch = tileNames.slice(i, i + batchSize);
                     const results = await Promise.all(batch.map(async name => {
                         try {
-                            const r = await fetch(`cache/xkt013/${name}.json`);
+                            const r = await fetch(`secondary/cache/xkt013/${name}.json`);
                             if (!r.ok) return null;
                             const d = await r.json();
                             if (d?.type === 'FeatureCollection') return d.features.map(f => {
@@ -2427,7 +2427,7 @@
                 return;
             }
 
-            let data = layerData[code];
+            const data = layerData[code];
             if (!data || !data.features || data.features.length === 0) {
                 alert('No data loaded for ' + code + '. Run fetch_reinfolib.py first.');
                 return;
@@ -2452,7 +2452,7 @@
                             if (t < 0.5) { const s = t * 2; color = `rgba(${180 + s * 20},${40 + s * 180},${40 + s * 180},0.65)` }
                             else { const s = (t - 0.5) * 2; color = `rgba(${220 - s * 180},${220},${220 - s * 180},0.65)` }
                         }
-                        return { ...f, properties: { ...p, _change: change != null ? change : 0 } };
+                        return { ...f, properties: { ...p, _color: color, _change: change } };
                     })
                 };
             }
@@ -2488,34 +2488,16 @@
                     map.addLayer({
                         id: layerId, type: 'fill', source: sourceId,
                         paint: {
-                            'fill-color': ['interpolate', ['linear'], ['get', '_change'],
-                                -50, 'rgb(180,30,30)',
-                                -30, 'rgb(220,80,80)',
-                                -10, 'rgb(240,180,160)',
-                                0, 'rgb(255,255,240)',
-                                10, 'rgb(180,230,160)',
-                                30, 'rgb(80,200,80)',
-                                50, 'rgb(20,160,20)'
-                            ],
-                            'fill-outline-color': 'rgba(26,50,96,0.08)',
-                            'fill-opacity': 0.65
+                            'fill-color': ['coalesce', ['get', '_color'], 'rgba(200,200,200,0.1)'],
+                            'fill-outline-color': 'rgba(26,50,96,0.08)'
                         }
                     });
                 } else {
                     map.addLayer({
                         id: layerId, type: 'fill', source: sourceId,
                         paint: style.paint || {
-                            'fill-color': ['interpolate', ['linear'], ['get', '_change'],
-                                -50, 'rgb(180,30,30)',
-                                -30, 'rgb(220,80,80)',
-                                -10, 'rgb(240,180,160)',
-                                0, 'rgb(255,255,240)',
-                                10, 'rgb(180,230,160)',
-                                30, 'rgb(80,200,80)',
-                                50, 'rgb(20,160,20)'
-                            ],
-                            'fill-outline-color': 'rgba(26,50,96,0.08)',
-                            'fill-opacity': 0.7
+                            'fill-color': 'rgba(69,144,184,0.3)',
+                            'fill-outline-color': 'rgba(26,50,96,0.3)'
                         }
                     });
                 }
@@ -2536,14 +2518,42 @@
             // Popup on click
             map.on('click', layerId, (e) => {
                 const props = e.features[0].properties;
-                const entries = Object.entries(props)
-                    .filter(([k, v]) => v && !k.startsWith('_') && k !== 'tilequery')
-                    .slice(0, 8)
-                    .map(([k, v]) => `<div style="display:flex;justify-content:space-between;gap:12px;padding:2px 0"><span style="color:#8596ad">${k}</span><span style="font-weight:500">${v}</span></div>`)
-                    .join('');
+                let html = '';
+
+                if (code === 'xkt013') {
+                    // Population popup — formatted
+                    const pop2025 = props.PT02_2025 || props.PT01_2025;
+                    const years = ['2025', '2030', '2035', '2040', '2045', '2050'];
+                    const rows = years.map(y => {
+                        const pop = props[`PT02_${y}`] || props[`PT01_${y}`];
+                        if (pop == null) return '';
+                        const change = pop2025 > 0 ? ((pop / pop2025 - 1) * 100).toFixed(1) : '—';
+                        const changeColor = change > 0 ? '#3a8a5c' : change < -10 ? '#c44e3f' : '#8596ad';
+                        return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(26,50,96,.06)">
+          <span style="color:#8596ad">${y}年</span>
+          <span style="font-weight:500">${pop.toFixed(0)}人</span>
+          <span style="font-weight:700;color:${changeColor}">${change > 0 ? '+' : ''}${change}%</span>
+        </div>`;
+                    }).join('');
+
+                    html = `<div style="font-family:'DM Sans',sans-serif;font-size:11px;color:#1A3260;min-width:200px">
+        <div style="font-weight:700;font-size:13px;margin-bottom:2px">250mメッシュ人口推計</div>
+        <div style="font-size:10px;color:#8596ad;margin-bottom:8px">基準: 2025年 ${pop2025 ? pop2025.toFixed(0) + '人' : 'N/A'}</div>
+        ${rows}
+      </div>`;
+                } else {
+                    // Generic popup for other layers
+                    const entries = Object.entries(props)
+                        .filter(([k, v]) => v && !k.startsWith('_') && k !== 'tilequery')
+                        .slice(0, 8)
+                        .map(([k, v]) => `<div style="display:flex;justify-content:space-between;gap:12px;padding:2px 0"><span style="color:#8596ad">${k}</span><span style="font-weight:500">${v}</span></div>`)
+                        .join('');
+                    html = `<div style="font-family:'DM Sans',sans-serif;font-size:11px;color:#1A3260">${entries}</div>`;
+                }
+
                 new maplibregl.Popup({ maxWidth: '320px' })
                     .setLngLat(e.lngLat)
-                    .setHTML(`<div style="font-family:var(--font);font-size:11px;color:var(--navy)">${entries}</div>`)
+                    .setHTML(html)
                     .addTo(map);
             });
         }

@@ -556,6 +556,12 @@
               style="accent-color:var(--acc)">
             Stations
           </label>
+          <label
+            style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2);cursor:pointer;user-select:none">
+            <input type="checkbox" id="prop-toggle" onchange="showProperties=this.checked;drawMap()"
+              style="accent-color:#C44E3F">
+            Properties
+          </label>
           <div class="tag" id="mt">297 polygons</div>
         </div>
         <div class="flt" id="flt"></div>
@@ -640,12 +646,13 @@
 
     const DATA =/*__SCORE_DATA__*/null;
     const STN =/*__STATION_DATA__*/null;
+    const PROPS =/*__PROPERTY_DATA__*/null;
 
     const PREFS = ['東京', '神奈', '埼玉', '千葉', '茨城'];
     const PF = { '東京': '東京都', '神奈': '神奈川県', '埼玉': '埼玉県', '千葉': '千葉県', '茨城': '茨城県' };
     const PC = { '東京': '#C44E3F', '神奈': '#4590B8', '埼玉': '#3A8A5C', '千葉': '#D4883E', '茨城': '#7B6DAF' };
 
-    let activePref = null, hoveredCode = null, highlightCode = null, showStations = false, hoveredStation = null;
+    let activePref = null, hoveredCode = null, highlightCode = null, showStations = false, hoveredStation = null, showProperties = false, hoveredProperty = null;
 
     // Zone definitions
     const ZONES =/*__ZONES_DATA__*/null;
@@ -965,7 +972,7 @@
             const sx = px(s.lo), sy = py(s.la);
             if (sx < -radius || sx > W + radius || sy < -radius || sy > H + radius) continue;
             const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, radius);
-            grad.addColorStop(0, `rgba(${s.t === 0 ? '50,180,80' : s.t === 4 ? '255,255,255' : '26,50,96'},${alpha})`);
+            grad.addColorStop(0, `rgba(26,50,96,${alpha})`);
             grad.addColorStop(0.5, `rgba(69,144,184,${alpha * 0.5})`);
             grad.addColorStop(1, 'rgba(69,144,184,0)');
             ctx.beginPath(); ctx.arc(sx, sy, radius, 0, Math.PI * 2);
@@ -974,7 +981,7 @@
         }
         // Draw station dots on top
         const dotR = [5, 3.5, 2, 1.5, 1];
-        const dotC = ['rgba(50,180,80,0.95)', 'rgba(26,50,96,0.9)', 'rgba(69,144,184,0.7)', 'rgba(69,144,184,0.45)', 'rgba(255,255,255,0.9)'];
+        const dotC = ['rgba(26,50,96,1)', 'rgba(26,50,96,0.9)', 'rgba(69,144,184,0.7)', 'rgba(69,144,184,0.45)', 'rgba(194,209,238,0.5)'];
         for (const s of STN) {
           const sx = px(s.lo), sy = py(s.la);
           if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
@@ -1012,6 +1019,48 @@
         if (!isPanning && PROPERTIES.length > 0) {
           const rect2 = canvas.getBoundingClientRect();
           // Check via last mouse position
+        }
+
+        // Property pins
+        if (showProperties && PROPS) {
+          for (const p of PROPS) {
+            const sx = px(p.lon), sy = py(p.lat);
+            if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
+            const isHov = (hoveredProperty === p);
+            // Pin shape
+            ctx.save();
+            ctx.translate(sx, sy);
+            // Drop shadow
+            ctx.beginPath();
+            ctx.arc(0, -12, isHov ? 10 : 7, Math.PI, 2 * Math.PI);
+            ctx.lineTo(0, 0);
+            ctx.closePath();
+            ctx.fillStyle = isHov ? '#1A3260' : '#C44E3F';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            // Inner dot
+            ctx.beginPath();
+            ctx.arc(0, -12, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.restore();
+            // Label on hover
+            if (isHov) {
+              const label = p.name;
+              ctx.font = 'bold 11px system-ui';
+              const tw = ctx.measureText(label).width;
+              ctx.fillStyle = 'rgba(26,50,96,.9)';
+              const bx = sx - tw / 2 - 6, by = sy - 35;
+              ctx.beginPath();
+              ctx.roundRect(bx, by, tw + 12, 20, 4);
+              ctx.fill();
+              ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+              ctx.fillText(label, sx, by + 10);
+              ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+            }
+          }
         }
 
         // Station hover label
@@ -1099,142 +1148,169 @@
       if (isPanning) { panX = e.clientX - panStartX; panY = e.clientY - panStartY; drawMap(); return }
       const rect = canvas.getBoundingClientRect();
       const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-      // Station hover (check first if stations visible)
-      let newHovStn = null;
-      if (showStations) {
-        let minD = 12;
-        for (const s of STN) {
-          const sx = px(s.lo), sy = py(s.la);
-          const d = Math.hypot(sx - mx, sy - my);
-          if (d < minD) { minD = d; newHovStn = s }
-        }
-      }
-      const stnChanged = newHovStn !== hoveredStation;
-      hoveredStation = newHovStn;
-      // Municipality hover
-      const hit = hitTest(mx, my);
-      const nc = hit ? hit.code : null;
-      if (nc !== hoveredCode || stnChanged) { hoveredCode = nc; drawMap() }
-      if (hoveredStation) {
-        const tl = ['Terminal', 'Hub', 'JR', 'Private', 'Local'];
-        tt.innerHTML = `<div class="tc">${hoveredStation.s}</div><div class="tp">${tl[hoveredStation.t]} station</div>`;
-        tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 200) + 'px';
-        tt.style.top = (e.clientY - 10) + 'px';
-        tt.classList.add('show');
-      } else if (hit) { showTT(hit, e.clientX, e.clientY) }
-      else { tt.classList.remove('show') }
-    });
-    canvas.addEventListener('mouseleave', () => { hoveredCode = null; drawMap(); tt.classList.remove('show') });
-    canvas.addEventListener('click', e => {
-      const rect = canvas.getBoundingClientRect();
-      const hit = hitTest(e.clientX - rect.left, e.clientY - rect.top);
-      highlightCode = hit ? hit.code : null; drawMap();
-      if (hit) {
-        const row = document.querySelector(`tr[data-c="${hit.code}"]`);
-        if (row) {
-          row.scrollIntoView({ block: 'center', behavior: 'smooth' });
-          document.querySelectorAll('.rtbl tr.hl').forEach(r => r.classList.remove('hl')); row.classList.add('hl')
-        }
-      }
-    });
-    window.addEventListener('resize', drawMap);
-
-    // RANKING
-    let rankSort = 'metric'; // 'metric' sorts by current metric
-    function renderRanking(q = '') {
-      const ql = q.toLowerCase();
-      const cfg = METRIC_CFG[metric];
-      let list = [...DATA].filter(d => getVal(d) != null).sort((a, b) => getVal(b) - getVal(a));
-      // Append nulls at end
-      const nulls = DATA.filter(d => getVal(d) == null);
-      list = list.concat(nulls);
-      if (activePref) list = list.filter(d => d.p === activePref);
-      if (ql) list = list.filter(d => d.n.includes(ql) || (d.e && d.e.toLowerCase().includes(ql)));
-      document.getElementById('rc').textContent = list.length;
-
-      const sortLabel = { to: 'Total', m: 'Macro', tr: 'Station' }[metric];
-      const html = '<table><thead><tr><th>#</th><th>Municipality</th><th class="sorted">' + sortLabel + '</th><th>M</th><th>S</th></tr></thead><tbody>' +
-        list.map((d, i) => {
-          const bg = PC[d.p] || '#666';
-          const val = getVal(d);
-          const maxR = cfg.maxR;
-          return `<tr data-c="${d.c}" onmouseenter="hoveredCode='${d.c}';drawMap()" onmouseleave="hoveredCode=null;drawMap()">
-        <td class="rk">${val != null ? i + 1 : '—'}</td>
-        <td><span class="cn">${d.n}</span> <span class="pb" style="background:${bg}22;color:${bg}">${PF[d.p] || d.p}</span></td>
-        <td><span class="sb" style="width:${val != null ? val / maxR * 36 : 0}px;background:${sc(val)}"></span><span class="sp" style="background:${sca(val, .15)};color:${sc(val)}">${val != null ? val : '—'}</span></td>
-        <td style="font-family:var(--mono);font-size:10px">${d.m}</td>
-        <td style="font-family:var(--mono);font-size:10px">${d.tr != null ? d.tr : '—'}</td>
-      </tr>`}).join('') + '</tbody></table>';
-      document.getElementById('rtbl').innerHTML = html;
-    }
-    document.getElementById('sq').addEventListener('input', e => renderRanking(e.target.value));
-
-    // SCATTER
-    const scData = DATA.filter(d => d.tr != null);
-    try {
-      new Chart(document.getElementById('scc'), {
-        type: 'scatter',
-        data: {
-          datasets: PREFS.map(p => ({
-            label: PF[p],
-            data: scData.filter(d => d.p === p).map(d => ({ x: d.m, y: d.tr, label: d.n })),
-            backgroundColor: PC[p] + '88', borderColor: PC[p], borderWidth: 1, pointRadius: 3.5, pointHoverRadius: 6
-          }))
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          scales: {
-            x: { title: { display: true, text: 'Macro', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 },
-            y: { title: { display: true, text: 'Station', color: '#7a8da6', font: { size: 10 } }, grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, min: 0, max: 55 }
-          },
-          plugins: {
-            legend: { position: 'top', labels: { boxWidth: 8, padding: 10, color: '#3d5a80', font: { size: 10 } } },
-            tooltip: { callbacks: { label: c => `${c.raw.label}: M=${c.raw.x} S=${c.raw.y}` } }
+      // Property hover
+      hoveredProperty = null;
+      if (showProperties && PROPS) {
+        for (const p of PROPS) {
+          const sx = px(p.lon), sy = py(p.lat);
+          if (Math.abs(mx - sx) < 12 && my > sy - 24 && my < sy + 4) {
+            hoveredProperty = p;
+            break;
           }
         }
-      })
-    } catch (e) { console.warn('Scatter chart init failed:', e) }
-
-    // HISTOGRAM
-    let histChart = null;
-    function updateHistogram() {
-      // Apply zone filter to histogram
-      const cfg = METRIC_CFG[metric];
-      const vals = DATA.filter(d => !zoneFilter || zoneFilter.has(d.c)).map(d => getVal(d)).filter(v => v != null);
-      const nBins = 10;
-      const range = cfg.max - cfg.min;
-      const bins = Array(nBins).fill(0);
-      vals.forEach(v => { const i = Math.min(nBins - 1, Math.floor((v - cfg.min) / range * nBins)); bins[i]++ });
-      const labels = bins.map((_, i) => { const lo = Math.round(cfg.min + i * range / nBins); const hi = Math.round(cfg.min + (i + 1) * range / nBins); return `${lo}–${hi}` });
-      const colors = bins.map((_, i) => sc(cfg.min + i * range / nBins + (range / nBins / 2)));
-
-      if (histChart) { histChart.destroy() }
-      histChart = new Chart(document.getElementById('hsc'), {
-        type: 'bar',
-        data: { labels, datasets: [{ data: bins, backgroundColor: colors, borderWidth: 0, borderRadius: 3 }] },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          scales: {
-            x: { grid: { display: false }, ticks: { color: '#7a8da6', font: { size: 9 } }, title: { display: true, text: cfg.label, color: '#7a8da6', font: { size: 10 } } },
-            y: { grid: { color: 'rgba(26,50,96,.06)' }, ticks: { color: '#7a8da6', font: { size: 9 } }, title: { display: true, text: 'Count', color: '#7a8da6', font: { size: 10 } } }
-          },
-          plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw} municipalities` } } }
-        }
-      });
+        if (hoveredProperty) {
+          drawMap();
+          // Show property popup
+          const p = hoveredProperty;
+          const irr = p.irr_pct ? p.irr_pct + '%' : '—';
+          const cap = p.cap_rate_pct ? p.cap_rate_pct + '%' : '—';
+          const price = p.acquisition_price_jpy ? (p.acquisition_price_jpy / 1e6).toFixed(0) + 'M' : '—';
+          tt.innerHTML =\`<div class="tc">\${p.name}</div><div class="tp">\${p.city} · \${p.property_type||''}</div>\`+
+        \`<div style="border-top:1px solid rgba(26,50,96,.08);margin:4px 0;padding-top:4px">\`+
+        \`<div class="tr"><span class="tl">Units</span><span class="tv">\${p.units||'—'}</span></div>\`+
+        \`<div class="tr"><span class="tl">GFA</span><span class="tv">\${p.gfa_sqm?p.gfa_sqm+'㎡':'—'}</span></div>\`+
+        \`<div class="tr"><span class="tl">Avg Rent</span><span class="tv">\${p.rent_avg_jpy?'¥'+p.rent_avg_jpy.toLocaleString():'—'}</span></div>\`+
+        \`<div class="tr"><span class="tl">Occupancy</span><span class="tv">\${p.occupancy_pct?p.occupancy_pct+'%':'—'}</span></div>\`+
+        \`<div class="tr"><span class="tl">Acquisition</span><span class="tv">¥\${price}</span></div>\`+
+        \`<div style="border-top:1px solid rgba(26,50,96,.08);margin:4px 0;padding-top:4px">\`+
+        \`<div class="tr"><span class="tl">IRR</span><span class="tv" style="color:#3a8a5c;font-weight:700">\${irr}</span></div>\`+
+        \`<div class="tr"><span class="tl">Cap Rate</span><span class="tv" style="color:#4590B8">\${cap}</span></div>\`+
+        \`<div class="tr"><span class="tl">Age</span><span class="tv">\${p.building_age_years?p.building_age_years+'y':'—'}</span></div>\`+
+        \`</div>\`;
+      tt.style.left=Math.min(e.clientX+14,window.innerWidth-270)+'px';
+      tt.style.top=(e.clientY-10)+'px';
+      tt.classList.add('show');
+      return;
     }
+  }
 
-    // Init — load sub-scores for factor toggles
-    // Sub-scores are embedded in DATA as sp,su,sa,si,ss
-    DATA.forEach(d => {
-      d._origM = { pop: d.sp || 0, u20: d.su || 0, a39: d.sa || 0, inc: d.si || 0, saf: d.ss || 0, stn: d.tr };
-    });
+  // Station hover (check first if stations visible)
+  let newHovStn=null;
+  if(showStations){
+    let minD=12;
+    for(const s of STN){
+      const sx=px(s.lo), sy=py(s.la);
+      const d=Math.hypot(sx-mx,sy-my);
+      if(d<minD){minD=d;newHovStn=s}
+    }
+  }
+  const stnChanged=newHovStn!==hoveredStation;
+  hoveredStation=newHovStn;
+  // Municipality hover
+  const hit=hitTest(mx,my);
+  const nc=hit?hit.code:null;
+  if(nc!==hoveredCode||stnChanged){hoveredCode=nc;drawMap()}
+  if(hoveredStation){
+    const tl=['Terminal','Hub','JR','Private','Local'];
+    tt.innerHTML=`< div class="tc" > ${ hoveredStation.s }</div > <div class="tp">${tl[hoveredStation.t]} station</div>`;
+    tt.style.left=Math.min(e.clientX+14,window.innerWidth-200)+'px';
+    tt.style.top=(e.clientY-10)+'px';
+    tt.classList.add('show');
+  }else if(hit){showTT(hit,e.clientX,e.clientY)}
+  else{tt.classList.remove('show')}
+});
+canvas.addEventListener('mouseleave',()=>{hoveredCode=null;drawMap();tt.classList.remove('show')});
+canvas.addEventListener('click',e=>{
+  const rect=canvas.getBoundingClientRect();
+  const hit=hitTest(e.clientX-rect.left,e.clientY-rect.top);
+  highlightCode=hit?hit.code:null;drawMap();
+  if(hit){
+    const row=document.querySelector(`tr[data - c= "${hit.code}"]`);
+    if(row){row.scrollIntoView({block:'center',behavior:'smooth'});
+      document.querySelectorAll('.rtbl tr.hl').forEach(r=>r.classList.remove('hl'));row.classList.add('hl')}
+  }
+});
+window.addEventListener('resize',drawMap);
 
-    initZoneTabs();
-    updateMetrics();
-    updateLegend();
-    setTimeout(drawMap, 50);
-    renderRanking();
-    updateHistogram();
+// RANKING
+let rankSort='metric'; // 'metric' sorts by current metric
+function renderRanking(q=''){
+  const ql=q.toLowerCase();
+  const cfg=METRIC_CFG[metric];
+  let list=[...DATA].filter(d=>getVal(d)!=null).sort((a,b)=>getVal(b)-getVal(a));
+  // Append nulls at end
+  const nulls=DATA.filter(d=>getVal(d)==null);
+  list=list.concat(nulls);
+  if(activePref)list=list.filter(d=>d.p===activePref);
+  if(ql)list=list.filter(d=>d.n.includes(ql)||(d.e&&d.e.toLowerCase().includes(ql)));
+  document.getElementById('rc').textContent=list.length;
+
+  const sortLabel={to:'Total',m:'Macro',tr:'Station'}[metric];
+  const html='<table><thead><tr><th>#</th><th>Municipality</th><th class="sorted">'+sortLabel+'</th><th>M</th><th>S</th></tr></thead><tbody>'+
+    list.map((d,i)=>{
+      const bg=PC[d.p]||'#666';
+      const val=getVal(d);
+      const maxR=cfg.maxR;
+      return`< tr data - c="${d.c}" onmouseenter = "hoveredCode='${d.c}';drawMap()" onmouseleave = "hoveredCode=null;drawMap()" >
+        <td class="rk">${val!=null?i+1:'—'}</td>
+        <td><span class="cn">${d.n}</span> <span class="pb" style="background:${bg}22;color:${bg}">${PF[d.p]||d.p}</span></td>
+        <td><span class="sb" style="width:${val!=null?val/maxR*36:0}px;background:${sc(val)}"></span><span class="sp" style="background:${sca(val,.15)};color:${sc(val)}">${val!=null?val:'—'}</span></td>
+        <td style="font-family:var(--mono);font-size:10px">${d.m}</td>
+        <td style="font-family:var(--mono);font-size:10px">${d.tr!=null?d.tr:'—'}</td>
+      </tr > `}).join('')+'</tbody></table>';
+  document.getElementById('rtbl').innerHTML=html;
+}
+document.getElementById('sq').addEventListener('input',e=>renderRanking(e.target.value));
+
+// SCATTER
+const scData=DATA.filter(d=>d.tr!=null);
+try{new Chart(document.getElementById('scc'),{
+  type:'scatter',
+  data:{datasets:PREFS.map(p=>({
+    label:PF[p],
+    data:scData.filter(d=>d.p===p).map(d=>({x:d.m,y:d.tr,label:d.n})),
+    backgroundColor:PC[p]+'88',borderColor:PC[p],borderWidth:1,pointRadius:3.5,pointHoverRadius:6
+  }))},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{
+      x:{title:{display:true,text:'Macro',color:'#7a8da6',font:{size:10}},grid:{color:'rgba(26,50,96,.06)'},ticks:{color:'#7a8da6',font:{size:9}},min:0,max:55},
+      y:{title:{display:true,text:'Station',color:'#7a8da6',font:{size:10}},grid:{color:'rgba(26,50,96,.06)'},ticks:{color:'#7a8da6',font:{size:9}},min:0,max:55}
+    },
+    plugins:{legend:{position:'top',labels:{boxWidth:8,padding:10,color:'#3d5a80',font:{size:10}}},
+      tooltip:{callbacks:{label:c=>`${ c.raw.label }: M = ${ c.raw.x } S = ${ c.raw.y } `}}
+    }
+  }
+})}catch(e){console.warn('Scatter chart init failed:',e)}
+
+// HISTOGRAM
+let histChart=null;
+function updateHistogram(){
+  // Apply zone filter to histogram
+  const cfg=METRIC_CFG[metric];
+  const vals=DATA.filter(d=>!zoneFilter||zoneFilter.has(d.c)).map(d=>getVal(d)).filter(v=>v!=null);
+  const nBins=10;
+  const range=cfg.max-cfg.min;
+  const bins=Array(nBins).fill(0);
+  vals.forEach(v=>{const i=Math.min(nBins-1,Math.floor((v-cfg.min)/range*nBins));bins[i]++});
+  const labels=bins.map((_,i)=>{const lo=Math.round(cfg.min+i*range/nBins);const hi=Math.round(cfg.min+(i+1)*range/nBins);return`${ lo }–${ hi } `});
+  const colors=bins.map((_,i)=>sc(cfg.min+i*range/nBins+(range/nBins/2)));
+
+  if(histChart){histChart.destroy()}
+  histChart=new Chart(document.getElementById('hsc'),{
+    type:'bar',
+    data:{labels,datasets:[{data:bins,backgroundColor:colors,borderWidth:0,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#7a8da6',font:{size:9}},title:{display:true,text:cfg.label,color:'#7a8da6',font:{size:10}}},
+        y:{grid:{color:'rgba(26,50,96,.06)'},ticks:{color:'#7a8da6',font:{size:9}},title:{display:true,text:'Count',color:'#7a8da6',font:{size:10}}}
+      },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${ c.raw } municipalities`}}}
+    }
+  });
+}
+
+// Init — load sub-scores for factor toggles
+// Sub-scores are embedded in DATA as sp,su,sa,si,ss
+DATA.forEach(d=>{
+  d._origM={pop:d.sp||0,u20:d.su||0,a39:d.sa||0,inc:d.si||0,saf:d.ss||0,stn:d.tr};
+});
+
+initZoneTabs();
+updateMetrics();
+updateLegend();
+setTimeout(drawMap,50);
+renderRanking();
+updateHistogram();
   </script>
 </body>
 
