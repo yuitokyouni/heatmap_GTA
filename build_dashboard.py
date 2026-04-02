@@ -34,6 +34,13 @@ SCRIPT_DIR = Path(__file__).parent
 # 1. Code format helpers
 # ============================================================
 
+def file_sha1(path: str) -> str:
+    h = hashlib.sha1()
+    with open(path, "rb") as f:
+        while chunk := f.read(8192):
+            h.update(chunk)
+    return h.hexdigest()[:10]
+
 def to_dashboard_code(raw_code: str) -> str:
     """
     Convert municipal code to 5-digit dashboard format (no check digit).
@@ -540,6 +547,7 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
     html = template.replace("/*__GEO_DATA__*/null", geo_json_merged)
     html = html.replace("/*__SCORE_DATA__*/null", score_json)
     html = html.replace("/*__STATION_DATA__*/null", station_json)
+    html = html.replace("/*__META_DATA__*/null", meta_json)
 
     zones_path = SCRIPT_DIR / "secondary" / "zones.json"
     if zones_path.exists():
@@ -571,16 +579,31 @@ Examples:
   python build_dashboard.py --data-dir ./data --output ./index.html
         """
     )
-    parser.add_argument("--data-dir", default=str(SCRIPT_DIR / "data"),
-                        help="Path to data directory (default: ./data)")
-    parser.add_argument("--output", default=str(SCRIPT_DIR / "index.html"),
-                        help="Output HTML path (default: ./index.html)")
-    parser.add_argument("--dynamic-thresholds", action="store_true",
-                        help="Recompute scoring thresholds from current data (vs fixed from Excel)")
-    parser.add_argument("--geo-dir", default=str(SCRIPT_DIR / "geo"),
-                        help="Path to geo data directory (default: ./geo)")
-    parser.add_argument("--template", default=str(SCRIPT_DIR / "template.html"),
-                        help="Path to HTML template (default: ./template.html)")
+    parser.add_argument(
+        "--data-dir",
+        default=str(SCRIPT_DIR / "data"),
+        help="Path to data directory (default: ./data)"
+    )
+    parser.add_argument(
+        "--output",
+        default=str(SCRIPT_DIR / "index.html"),
+        help="Output HTML path (default: ./index.html)"
+    )
+    parser.add_argument(
+        "--dynamic-thresholds",
+        action="store_true",
+        help="Recompute scoring thresholds from current data (vs fixed from Excel)"
+    )
+    parser.add_argument(
+        "--geo-dir",
+        default=str(SCRIPT_DIR / "geo"),
+        help="Path to geo data directory (default: ./geo)"
+    )
+    parser.add_argument(
+        "--template",
+        default=str(SCRIPT_DIR / "template.html"),
+        help="Path to HTML template (default: ./template.html)"
+    )
 
     args = parser.parse_args()
 
@@ -600,11 +623,16 @@ Examples:
     # Step 2: Compute scores
     print("\n[Step 2] Computing scores...")
     results, thresholds = compute_all_scores(
-        pop_data, age_data, income_data, crime_data, station_data,
-        existing_detail, dynamic_thresholds=args.dynamic_thresholds
+        pop_data,
+        age_data,
+        income_data,
+        crime_data,
+        station_data,
+        existing_detail,
+        dynamic_thresholds=args.dynamic_thresholds
     )
 
-    # Step 3: Write CSVs
+    # Step 3: Write score CSVs
     print("\n[Step 3] Writing score CSVs...")
     write_scores_csv(results, args.data_dir)
 
@@ -624,14 +652,22 @@ Examples:
     if not os.path.exists(geo_path):
         print(f"  [ERROR] GeoJSON not found: {geo_path}")
         sys.exit(1)
+
     if not os.path.exists(station_path):
         print(f"  [ERROR] Station data not found: {station_path}")
         sys.exit(1)
+
     if not os.path.exists(args.template):
         print(f"  [ERROR] Template not found: {args.template}")
         sys.exit(1)
 
-    html = build_html(score_json, geo_path, station_path, args.template, meta_json)
+    html = build_html(
+        score_json,
+        geo_path,
+        station_path,
+        args.template,
+        meta_json
+    )
 
     with open(args.output, "w", encoding="utf-8") as f:
         f.write(html)
@@ -639,15 +675,16 @@ Examples:
     # Summary
     scored = [r for r in results if r["macro_total"] > 0]
     with_station = [r for r in results if r["station_score"] is not None]
-    print(f"\n{'='*60}")
-    print(f"BUILD COMPLETE")
-    print(f"{'='*60}")
+
+    print(f"\n{'=' * 60}")
+    print("BUILD COMPLETE")
+    print(f"{'=' * 60}")
     print(f"  Municipalities scored: {len(scored)}")
     print(f"  With station data:     {len(with_station)}")
     print(f"  Macro range:           {min(r['macro_total'] for r in scored)} – {max(r['macro_total'] for r in scored)}")
     print(f"  Total range:           {min(r['total_score'] for r in scored)} – {max(r['total_score'] for r in scored)}")
     print(f"  Output:                {args.output}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
 
 if __name__ == "__main__":
