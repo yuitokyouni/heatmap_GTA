@@ -508,7 +508,7 @@ def build_methodology_meta(args, results, thresholds) -> str:
 # 6. HTML generation
 # ============================================================
 
-def build_html(score_json: str, geo_path: str, station_path: str, template_path: str) -> str:
+def build_html(score_json: str, geo_path: str, station_path: str, template_path: str, meta_json: str) -> str:
     print("\n  Building index.html.")
 
     with open(template_path, "r", encoding="utf-8-sig") as f:
