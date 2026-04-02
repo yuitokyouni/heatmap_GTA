@@ -972,8 +972,8 @@
             const sx = px(s.lo), sy = py(s.la);
             if (sx < -radius || sx > W + radius || sy < -radius || sy > H + radius) continue;
             const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, radius);
-            grad.addColorStop(0, `rgba(26,50,96,${alpha})`);
-            grad.addColorStop(0.5, `rgba(69,144,184,${alpha * 0.5})`);
+            grad.addColorStop(0, `rgba(${s.t === 0 ? '50,180,80' : s.t === 4 ? '255,255,255' : '26,50,96'},${alpha})`);
+            grad.addColorStop(0.5, `rgba(${s.t === 0 ? '50,180,80' : s.t === 4 ? '255,255,255' : '69,144,184'},${alpha * 0.5})`);
             grad.addColorStop(1, 'rgba(69,144,184,0)');
             ctx.beginPath(); ctx.arc(sx, sy, radius, 0, Math.PI * 2);
             ctx.fillStyle = grad; ctx.fill();
@@ -981,47 +981,15 @@
         }
         // Draw station dots on top
         const dotR = [5, 3.5, 2, 1.5, 1];
-        const dotC = ['rgba(26,50,96,1)', 'rgba(26,50,96,0.9)', 'rgba(69,144,184,0.7)', 'rgba(69,144,184,0.45)', 'rgba(194,209,238,0.5)'];
+        const dotC = ['rgba(50,180,80,0.95)', 'rgba(26,50,96,0.9)', 'rgba(69,144,184,0.7)', 'rgba(69,144,184,0.45)', 'rgba(255,255,255,0.9)'];
         for (const s of STN) {
           const sx = px(s.lo), sy = py(s.la);
           if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
           ctx.beginPath(); ctx.arc(sx, sy, dotR[s.t], 0, Math.PI * 2);
           ctx.fillStyle = dotC[s.t]; ctx.fill();
         }
-        // Property pins
-        for (const p of PROPERTIES) {
-          const sx = px(p.lon), sy = py(p.lat);
-          if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
-          // Pin shape
-          ctx.save();
-          ctx.translate(sx, sy);
-          ctx.beginPath();
-          ctx.moveTo(0, -22);
-          ctx.bezierCurveTo(-8, -22, -12, -14, -12, -10);
-          ctx.bezierCurveTo(-12, -4, -2, 2, 0, 6);
-          ctx.bezierCurveTo(2, 2, 12, -4, 12, -10);
-          ctx.bezierCurveTo(12, -14, 8, -22, 0, -22);
-          ctx.closePath();
-          ctx.fillStyle = '#1A3260';
-          ctx.fill();
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-          // Inner dot
-          ctx.beginPath();
-          ctx.arc(0, -12, 3.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#fff';
-          ctx.fill();
-          ctx.restore();
-        }
 
-        // Property hover detection
-        if (!isPanning && PROPERTIES.length > 0) {
-          const rect2 = canvas.getBoundingClientRect();
-          // Check via last mouse position
-        }
-
-        // Property pins
+        // Station hover label
         if (showProperties && PROPS) {
           for (const p of PROPS) {
             const sx = px(p.lon), sy = py(p.lat);

@@ -497,6 +497,7 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
             feature["properties"]["m"] = s["m"]
             feature["properties"]["tr"] = s.get("tr")
             feature["properties"]["e"] = s.get("e", "")
+            feature["properties"]["p"] = s.get("p", "")
 
     geo_json_merged = json.dumps(geo_data, ensure_ascii=False, separators=(",", ":"))
 
@@ -520,7 +521,7 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
     if props_path.exists():
         with open(props_path, encoding="utf-8") as f:
             props_data = f.read()
-        html = html.replace("/*__PROPERTIES_DATA__*/[]", props_data)
+        html = html.replace("/*__PROPERTY_DATA__*/null", props_data)
         print(f"    Properties: {len(props_data)/1024:.0f} KB")
     else:
         print(f"    Properties: (not found, no pins shown)")
