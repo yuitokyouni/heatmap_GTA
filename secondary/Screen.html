@@ -2398,10 +2398,10 @@
                 name: '立地適正化計画',
                 paint: {
                     'fill-color': ['match', ['get', 'kubun_name_ja'],
-                        '居住誘導区域', 'rgba(58,138,92,0.35)',
-                        '都市機能誘導区域', 'rgba(69,144,184,0.45)',
-                        '立地適正化計画区域', 'rgba(194,209,238,0.25)',
-                        'rgba(200,200,200,0.15)'
+                        '居住誘導区域', 'rgba(212,136,62,0.3)',
+                        '都市機能誘導区域', 'rgba(196,78,63,0.35)',
+                        '立地適正化計画区域', 'rgba(230,210,180,0.15)',
+                        'rgba(200,200,200,0.1)'
                     ],
                     'fill-outline-color': 'rgba(26,50,96,0.3)'
                 }
@@ -2463,6 +2463,31 @@
             const geomType = data.features[0]?.geometry?.type || 'Polygon';
             const style = LAYER_STYLES[code] || {};
 
+            // XKT015: draw 1km radius circles around stations
+            if (code === 'xkt015') {
+                // Convert station lines to center points with 1km buffer circles
+                var stationPoints = {
+                    type: 'FeatureCollection', features: data.features.map(f => {
+                        var coords = f.geometry.coordinates;
+                        var center = f.geometry.type === 'LineString' ? coords[Math.floor(coords.length / 2)] :
+                            f.geometry.type === 'Point' ? coords : [coords[0][0], coords[0][0]];
+                        return { type: 'Feature', geometry: { type: 'Point', coordinates: center }, properties: f.properties };
+                    })
+                };
+                if (map.getSource(sourceId)) map.removeSource(sourceId);
+                map.addSource(sourceId, { type: 'geojson', data: stationPoints });
+                map.addLayer({
+                    id: layerId, type: 'circle', source: sourceId,
+                    paint: {
+                        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 2, 12, 20, 14, 60, 16, 200],
+                        'circle-color': 'rgba(26,50,96,0.12)',
+                        'circle-stroke-width': 1.5,
+                        'circle-stroke-color': 'rgba(26,50,96,0.3)'
+                    }
+                });
+                return;
+            }
+
             if (geomType === 'Point' || geomType === 'MultiPoint') {
                 map.addLayer({
                     id: layerId, type: 'circle', source: sourceId,
@@ -2490,10 +2515,11 @@
                         id: layerId, type: 'fill', source: sourceId,
                         paint: {
                             'fill-color': ['interpolate', ['linear'], ['get', '_change'],
-                                -50, 'rgb(200,60,60)', -20, 'rgb(210,140,140)', 0, 'rgb(245,245,230)',
-                                20, 'rgb(140,210,140)', 50, 'rgb(20,160,20)'],
-                            'fill-outline-color': 'rgba(26,50,96,0.08)',
-                            'fill-opacity': 0.65
+                                -50, 'rgb(255,255,255)', 0, 'rgb(255,255,255)',
+                                5, 'rgb(180,230,160)', 20, 'rgb(80,200,80)', 50, 'rgb(20,140,20)'],
+                            'fill-outline-color': ['case', ['>', ['get', '_change'], 0], 'rgba(26,50,96,0.1)', 'rgba(0,0,0,0)'],
+                            'fill-opacity': ['interpolate', ['linear'], ['get', '_change'],
+                                -50, 0, 0, 0, 1, 0.5, 20, 0.7, 50, 0.85]
                         }
                     });
                 } else {
@@ -2513,9 +2539,9 @@
                 lp.style.display = 'block';
                 lp.innerHTML = `
       <div style="font-weight:600;margin-bottom:6px;color:var(--navy)">立地適正化計画</div>
-      <div class="legend-row"><div class="legend-swatch" style="background:rgba(69,144,184,0.45)"></div>都市機能誘導区域</div>
-      <div class="legend-row"><div class="legend-swatch" style="background:rgba(58,138,92,0.35)"></div>居住誘導区域</div>
-      <div class="legend-row"><div class="legend-swatch" style="background:rgba(194,209,238,0.25)"></div>立地適正化計画区域</div>
+      <div class="legend-row"><div class="legend-swatch" style="background:rgba(196,78,63,0.35)"></div>都市機能誘導区域</div>
+      <div class="legend-row"><div class="legend-swatch" style="background:rgba(212,136,62,0.3)"></div>居住誘導区域</div>
+      <div class="legend-row"><div class="legend-swatch" style="background:rgba(230,210,180,0.15)"></div>立地適正化計画区域</div>
     `;
             }
 
