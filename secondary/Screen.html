@@ -2518,8 +2518,9 @@
                                 -50, 'rgb(255,255,255)', 0, 'rgb(255,255,255)',
                                 5, 'rgb(180,230,160)', 20, 'rgb(80,200,80)', 50, 'rgb(20,140,20)'],
                             'fill-outline-color': ['case', ['>', ['get', '_change'], 0], 'rgba(26,50,96,0.1)', 'rgba(0,0,0,0)'],
-                            'fill-opacity': ['interpolate', ['linear'], ['get', '_change'],
-                                -50, 0, 0, 0, 1, 0.5, 20, 0.7, 50, 0.85]
+                            'fill-opacity': ['case', ['==', ['get', '_change'], null], 0,
+                                ['interpolate', ['linear'], ['get', '_change'],
+                                    -50, 0, 0, 0, 1, 0.5, 20, 0.7, 50, 0.85]]
                         }
                     });
                 } else {
