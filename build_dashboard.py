@@ -508,23 +508,18 @@ def build_methodology_meta(args, results, thresholds) -> str:
 # 6. HTML generation
 # ============================================================
 
-def build_html(score_json: str, geo_path: str, station_path: str, template_path: str, meta_json: str) -> str:
-    """
-    Read template.html, inject GeoJSON + score data + station data + methodology metadata.
-    """
-    print("\n  Building index.html...")
+def build_html(score_json: str, geo_path: str, station_path: str, template_path: str) -> str:
+    print("\n  Building index.html.")
 
-    with open(template_path) as f:
+    with open(template_path, "r", encoding="utf-8-sig") as f:
         template = f.read()
 
-    with open(geo_path) as f:
+    with open(geo_path, "r", encoding="utf-8-sig") as f:
         geo_json = f.read()
 
-    with open(station_path) as f:
+    with open(station_path, "r", encoding="utf-8-sig") as f:
         station_json = f.read()
 
-    # Also need to merge score data INTO the GeoJSON properties
-    # so the choropleth colors work
     scores_by_code = {}
     for entry in json.loads(score_json):
         scores_by_code[entry["c"]] = entry
@@ -542,36 +537,21 @@ def build_html(score_json: str, geo_path: str, station_path: str, template_path:
 
     geo_json_merged = json.dumps(geo_data, ensure_ascii=False, separators=(",", ":"))
 
-    # Inject into template
     html = template.replace("/*__GEO_DATA__*/null", geo_json_merged)
     html = html.replace("/*__SCORE_DATA__*/null", score_json)
     html = html.replace("/*__STATION_DATA__*/null", station_json)
-    html = html.replace("/*__META_DATA__*/null", meta_json)
 
-    # Inject zones data if available
     zones_path = SCRIPT_DIR / "secondary" / "zones.json"
     if zones_path.exists():
-        with open(zones_path) as f:
+        with open(zones_path, "r", encoding="utf-8-sig") as f:
             zones_data = f.read()
         html = html.replace("/*__ZONES_DATA__*/null", zones_data)
-        print(f"    Zones:    {len(zones_data)/1024:.0f} KB")
-    else:
-        print(f"    Zones:    (not found, zone tabs disabled)")
 
-    # Inject property data if available
     props_path = SCRIPT_DIR / "data" / "properties.json"
     if props_path.exists():
-        with open(props_path, encoding="utf-8") as f:
+        with open(props_path, "r", encoding="utf-8-sig") as f:
             props_data = f.read()
         html = html.replace("/*__PROPERTY_DATA__*/null", props_data)
-        print(f"    Properties: {len(props_data)/1024:.0f} KB")
-    else:
-        print(f"    Properties: (not found, no pins shown)")
-
-    print(f"  index.html: {len(html)/1024:.0f} KB")
-    print(f"    GeoJSON:  {len(geo_json_merged)/1024:.0f} KB")
-    print(f"    Scores:   {len(score_json)/1024:.0f} KB")
-    print(f"    Stations: {len(station_json)/1024:.0f} KB")
 
     return html
 
