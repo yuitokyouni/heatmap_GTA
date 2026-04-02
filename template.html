@@ -1181,33 +1181,32 @@
           return;
         }
       }
-    }
 
-  // Station hover (check first if stations visible)
-  let newHovStn = null;
-    if (showStations) {
-      let minD = 12;
-      for (const s of STN) {
-        const sx = px(s.lo), sy = py(s.la);
-        const d = Math.hypot(sx - mx, sy - my);
-        if (d < minD) { minD = d; newHovStn = s }
+      // Station hover (check first if stations visible)
+      let newHovStn = null;
+      if (showStations) {
+        let minD = 12;
+        for (const s of STN) {
+          const sx = px(s.lo), sy = py(s.la);
+          const d = Math.hypot(sx - mx, sy - my);
+          if (d < minD) { minD = d; newHovStn = s }
+        }
       }
-    }
-    const stnChanged = newHovStn !== hoveredStation;
-    hoveredStation = newHovStn;
-    // Municipality hover
-    const hit = hitTest(mx, my);
-    const nc = hit ? hit.code : null;
-    if (nc !== hoveredCode || stnChanged) { hoveredCode = nc; drawMap() }
-    if (hoveredStation) {
-      const tl = ['Terminal', 'Hub', 'JR', 'Private', 'Local'];
-      tt.innerHTML = `<div class="tc">${hoveredStation.s}</div><div class="tp">${tl[hoveredStation.t]} station</div>`;
-      tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 200) + 'px';
-      tt.style.top = (e.clientY - 10) + 'px';
-      tt.classList.add('show');
-    } else if (hit) { showTT(hit, e.clientX, e.clientY) }
-    else { tt.classList.remove('show') }
-});
+      const stnChanged = newHovStn !== hoveredStation;
+      hoveredStation = newHovStn;
+      // Municipality hover
+      const hit = hitTest(mx, my);
+      const nc = hit ? hit.code : null;
+      if (nc !== hoveredCode || stnChanged) { hoveredCode = nc; drawMap() }
+      if (hoveredStation) {
+        const tl = ['Terminal', 'Hub', 'JR', 'Private', 'Local'];
+        tt.innerHTML = `<div class="tc">${hoveredStation.s}</div><div class="tp">${tl[hoveredStation.t]} station</div>`;
+        tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 200) + 'px';
+        tt.style.top = (e.clientY - 10) + 'px';
+        tt.classList.add('show');
+      } else if (hit) { showTT(hit, e.clientX, e.clientY) }
+      else { tt.classList.remove('show') }
+    });
     canvas.addEventListener('mouseleave', () => { hoveredCode = null; drawMap(); tt.classList.remove('show') });
     canvas.addEventListener('click', e => {
       const rect = canvas.getBoundingClientRect();
